@@ -1,0 +1,115 @@
+/* ResellingKori Fulfillment Connector - admin styles */
+
+.rkc-muted { color: #646970; font-size: 12px; }
+.rkc-ok { color: #1a7f37; font-weight: 600; }
+.rkc-bad { color: #b32d2e; }
+.rkc-oktext { color: #1a7f37; margin: 4px 0 8px; }
+.rkc-warntext { color: #9a6700; margin: 4px 0 8px; }
+
+/* Badges */
+.rkc-badge {
+	display: inline-block;
+	padding: 1px 8px;
+	border-radius: 10px;
+	font-size: 11px;
+	font-weight: 600;
+	line-height: 1.7;
+	background: #f0f0f1;
+	color: #3c434a;
+	white-space: nowrap;
+}
+.rkc-badge.rkc-high,
+.rkc-badge.rkc-s-delivered { background: #d5f2dc; color: #0a5c1f; }
+.rkc-badge.rkc-medium,
+.rkc-badge.rkc-s-shipped,
+.rkc-badge.rkc-warn { background: #fff3cd; color: #7a5b00; }
+.rkc-badge.rkc-low { background: #f0f0f1; color: #50575e; }
+.rkc-badge.rkc-s-processing { background: #d6e9ff; color: #0b4a8f; }
+.rkc-badge.rkc-s-pending { background: #f0f0f1; color: #50575e; }
+.rkc-badge.rkc-s-returned,
+.rkc-badge.rkc-s-cancelled { background: #fbdada; color: #8a1f1f; }
+
+/* Messages */
+.rkc-msg { padding: 6px 10px; margin: 0 0 8px; border-left: 4px solid #c3c4c7; background: #f6f7f7; font-size: 13px; }
+.rkc-msg.rkc-error { border-left-color: #d63638; background: #fcf0f1; }
+.rkc-msg.rkc-success { border-left-color: #00a32a; background: #edfaef; }
+.rkc-test-result { margin-left: 8px; }
+.rkc-test-result.is-ok { color: #1a7f37; }
+.rkc-test-result.is-bad { color: #b32d2e; }
+
+/* Settings */
+.rkc-check { display: inline-block; margin: 0 16px 6px 0; }
+
+/* Mapping page */
+.rkc-intro { max-width: 900px; }
+.rkc-toolbar { display: flex; align-items: center; gap: 12px; }
+.rkc-wrap .wp-list-table .column-rkc_thumb { width: 52px; }
+.rkc-wrap .wp-list-table .column-rkc_act { width: 170px; }
+.rkc-wrap .wp-list-table td { vertical-align: middle; }
+
+/* Order box (metabox + orders list) */
+.rkc-box .rkc-line { margin-bottom: 6px; }
+.rkc-box .rkc-lines { margin: 0 0 8px; padding: 0; list-style: none; }
+.rkc-box .rkc-lines li { padding: 4px 0; border-bottom: 1px solid #f0f0f1; display: flex; flex-direction: column; gap: 2px; }
+.rkc-box .rkc-track { margin: 4px 0; }
+.column-rkc_status { width: 150px; }
+
+/* Modal */
+body.rkc-modal-open { overflow: hidden; }
+.rkc-overlay {
+	position: fixed;
+	inset: 0;
+	z-index: 100100;
+	background: rgba(0, 0, 0, 0.55);
+	display: flex;
+	align-items: flex-start;
+	justify-content: center;
+	padding: 5vh 16px;
+	overflow-y: auto;
+}
+.rkc-modal {
+	background: #fff;
+	width: 100%;
+	max-width: 780px;
+	border-radius: 6px;
+	box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+.rkc-modal-head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 12px 20px;
+	border-bottom: 1px solid #dcdcde;
+}
+.rkc-modal-head h2 { margin: 0; font-size: 16px; }
+.rkc-modal-close { border: 0; background: none; font-size: 26px; line-height: 1; cursor: pointer; color: #50575e; }
+.rkc-modal-body { padding: 16px 20px 24px; }
+.rkc-modal-body h3 { margin: 22px 0 8px; font-size: 14px; padding-top: 12px; border-top: 1px solid #f0f0f1; }
+.rkc-prod { display: flex; gap: 12px; align-items: center; }
+.rkc-prod img { border-radius: 4px; object-fit: cover; }
+.rkc-kw { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; }
+.rkc-kw input { flex: 1; min-width: 200px; }
+
+/* Candidates */
+.rkc-cand { border: 1px solid #dcdcde; border-radius: 4px; padding: 10px 12px; margin-bottom: 8px; }
+.rkc-cand-head { display: flex; gap: 10px; align-items: flex-start; }
+.rkc-cand-head img,
+.rkc-noimg { width: 48px; height: 48px; flex: 0 0 48px; border-radius: 4px; object-fit: cover; background: #f0f0f1; display: inline-block; }
+.rkc-cand-main { flex: 1; min-width: 0; }
+.rkc-cand-main a,
+.rkc-cand-main strong { font-weight: 600; }
+.rkc-diff { font-size: 12px; color: #8a4b00; margin-top: 2px; }
+.rkc-cand-actions { margin-top: 8px; }
+.rkc-pick { margin-top: 8px; }
+.rkc-vars { margin: 6px 0 0; padding: 0; list-style: none; max-height: 220px; overflow-y: auto; }
+.rkc-vars li { display: flex; gap: 10px; align-items: center; padding: 5px 6px; border-top: 1px solid #f0f0f1; }
+.rkc-vars li.is-match { background: #edfaef; }
+.rkc-var-label { font-weight: 600; min-width: 120px; }
+.rkc-vars li .button { margin-left: auto; }
+
+/* Mixed orders: choose which ResellingKori items to send */
+.rkc-partial .rkc-lines li { gap: 3px; }
+.rkc-partial label { display: block; }
+.rkc-partial .rkc-extra { width: 90px; }
+.rkc-partial .rkc-cod { margin: 6px 0; }
+.rkc-partial .rkc-cod-amount { font-size: 14px; }

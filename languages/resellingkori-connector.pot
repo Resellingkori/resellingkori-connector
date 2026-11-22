@@ -1,0 +1,2192 @@
+# Copyright (C) 2026 ResellingKori
+# This file is distributed under the GPL-2.0-or-later.
+msgid ""
+msgstr ""
+"Project-Id-Version: ResellingKori Fulfillment Connector 1.1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-04T00:00:00+00:00\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Domain: resellingkori-connector\n"
+
+#. Plugin Name of the plugin
+#: resellingkori-connector.php
+msgid "ResellingKori Fulfillment Connector"
+msgstr ""
+
+#. Description of the plugin
+#: resellingkori-connector.php
+msgid "Connect your WooCommerce store to ResellingKori: match your products (SKU first, name suggestions second), send paid orders for fulfilment with your own selling prices, receive status and tracking back automatically, and (optionally) manage the same from your ResellingKori agent dashboard."
+msgstr ""
+
+#. Author of the plugin
+#: resellingkori-connector.php
+msgid "ResellingKori"
+msgstr ""
+
+#. translators: %s: product name
+#: includes/class-rkc-orders.php:302
+#, php-format
+msgid "\"%s\" has a price below 1 BDT and cannot be sent."
+msgstr ""
+
+#. translators: %s: product name
+#: includes/class-rkc-orders.php:324
+#, php-format
+msgid "\"%s\" is out of stock at ResellingKori."
+msgstr ""
+
+#. translators: %s: product name
+#: includes/class-rkc-orders.php:319
+#, php-format
+msgid "\"%s\" is priced below the ResellingKori base price. ResellingKori may refuse it."
+msgstr ""
+
+#. translators: 1: product, 2: quantity ordered, 3: quantity available at ResellingKori
+#: includes/admin/class-rkc-admin-order.php:232
+#, php-format
+msgid "%1$s: you need %2$s, ResellingKori has %3$s."
+msgstr ""
+
+#. translators: %d: number of products
+#: includes/admin/class-rkc-admin-ajax.php:280
+#, php-format
+msgid "%d link was confirmed."
+msgid_plural "%d links were confirmed."
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %d: number of products
+#: includes/admin/class-rkc-admin-ajax.php:267
+#, php-format
+msgid "%d link was removed."
+msgid_plural "%d links were removed."
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %d: number of products
+#: includes/admin/class-rkc-admin-pages.php:289
+#, php-format
+msgid "%d linked product is unavailable at ResellingKori."
+msgid_plural "%d linked products are unavailable at ResellingKori."
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %d: number of products
+#: includes/admin/class-rkc-admin-pages.php:285
+#, php-format
+msgid "%d product link needs your confirmation before orders will use it."
+msgid_plural "%d product links need your confirmation before orders will use them."
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %d: number of products
+#: includes/admin/class-rkc-admin-pages.php:437
+#, php-format
+msgid "%d product linked"
+msgid_plural "%d products linked"
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %s: time difference such as "5 minutes"
+#: includes/class-rkc-db.php:39
+#, php-format
+msgid "%s ago"
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:182
+msgid "1 · Exact SKU"
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:183
+msgid "2 · Similar names"
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:184
+msgid "3 · Search, or paste an ID or SKU"
+msgstr ""
+
+#: includes/class-rkc-workspace-exec.php:322
+msgid "A ResellingKori price changed after it was confirmed in the dashboard, so nothing was sent. Open the order again and check your profit."
+msgstr ""
+
+#. translators: %s: masked key id
+#: includes/admin/class-rkc-admin-pages.php:374
+#, php-format
+msgid "A key is saved: %s. The secret is stored encrypted and is never shown again."
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:361
+msgid "A sync is already running. Try again in a moment."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:674
+msgid "Actions"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:229 includes/admin/class-rkc-admin.php:161
+msgid "Active"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:514
+msgid "After sending"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:164
+msgid "Agent dashboard"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:273
+msgid "Agent dashboard:"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:641 includes/admin/class-rkc-admin-pages.php:781
+msgid "All"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:852
+msgid "All levels"
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:213
+msgid "Already paid by the customer"
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:212
+msgid "Already paid or credited"
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:205
+#, php-format
+msgid "Also collect %s of fees or adjustments from the customer."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:148
+msgid "Ask a store administrator to finish the setup."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:349
+msgid "Ask your host to enable the PHP sodium extension."
+msgstr ""
+
+#: includes/class-rkc-submit.php:418
+msgid "Automatic checks have stopped. Press \"Check status\" to try again."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:735 includes/admin/class-rkc-admin.php:171
+msgid "Available"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:596
+msgid "Available after the shop is connected to ResellingKori."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:330
+msgid "Back"
+msgstr ""
+
+#. translators: %s: price
+#: includes/admin/class-rkc-admin-pages.php:728
+#, php-format
+msgid "Base %s"
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:174
+#, php-format
+msgid "Base price %s"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:345
+msgid "Before you start"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:662
+msgid "Bulk actions"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-order.php:82
+msgid "Can be sent"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-order.php:184
+msgid "Cancel at ResellingKori"
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:223
+msgid "Cancel the order at ResellingKori"
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:220
+msgid "Cancel this order at ResellingKori"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:49 includes/admin/class-rkc-admin-pages.php:781 includes/class-rkc-settings.php:70
+msgid "Cancelled"
+msgstr ""
+
+#. translators: %s: reason
+#: includes/class-rkc-submit.php:575
+#, php-format
+msgid "Cancelled at ResellingKori. %s"
+msgstr ""
+
+#: includes/class-rkc-workspace-exec.php:367
+msgid "Cancelled from the agent dashboard."
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:214
+msgid "Cash the courier collects"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-order.php:147 includes/admin/class-rkc-admin-order.php:149 includes/admin/class-rkc-admin-pages.php:793 includes/admin/class-rkc-admin-pages.php:809
+msgid "Cash to collect"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:751
+msgid "Change"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:515
+msgid "Change the order status to"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:666
+msgid "Check prices and availability"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-order.php:190
+msgid "Check status"
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:217
+msgid "Check the amounts once more: the courier collects exactly the \"cash the courier collects\" amount."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:443
+msgid "Check the items, your profit and the cash the courier will collect, then confirm."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-ajax.php:449
+msgid "Checked with ResellingKori."
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:189
+#, php-format
+msgid "Checking… checked %1$s · unavailable %2$s"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:623
+msgid "Checks for new instructions and sends the latest changes straight away. This happens automatically about once a minute."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-ajax.php:239
+msgid "Choose a ResellingKori product."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:528
+msgid "Choose how your own order status follows ResellingKori. Leave blank to only record the status and tracking on the order. Mixed orders are never changed."
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:169
+msgid "Choose the exact variation"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:861
+msgid "Clear the log"
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:152
+msgid "Close"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:753
+msgid "Confirm"
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:218
+msgid "Confirm and send to ResellingKori"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:664
+msgid "Confirm links"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:302
+msgid "Connect"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:372
+msgid "Connect with your key"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:143
+msgid "Connect your store to ResellingKori"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:72 includes/admin/class-rkc-admin.php:156
+msgid "Connected"
+msgstr ""
+
+#. translators: %s: store name
+#: includes/admin/class-rkc-admin-pages.php:436
+#, php-format
+msgid "Connected as %s"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:404
+msgid "Connected."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:156 includes/admin/class-rkc-admin-pages.php:453
+msgid "Connection"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:74
+msgid "Connection problem"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:131
+msgid "Connection problem:"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:367 includes/admin/class-rkc-admin-pages.php:378 includes/admin/class-rkc-admin-pages.php:408 includes/admin/class-rkc-admin-pages.php:421
+msgid "Continue"
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:149
+msgid "Copied"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:847
+msgid "Copy diagnostics"
+msgstr ""
+
+#: includes/class-rkc-api-client.php:101
+msgid "Could not reach ResellingKori. Check your internet connection and try again."
+msgstr ""
+
+#. translators: %s: list of missing fields
+#: includes/class-rkc-orders.php:235
+#, php-format
+msgid "Customer information missing: %s."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:106
+msgid "Dashboard"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:861
+msgid "Delete all log entries?"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:564
+msgid "Delete all plugin data (links, submission records, logs) when the plugin is deleted"
+msgstr ""
+
+#: includes/class-rkc-settings.php:68
+msgid "Delivered"
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:207
+msgid "Delivery charge"
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:203
+msgid "Delivery charge the customer pays (BDT)"
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:216
+msgid "Delivery to"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:164 includes/admin/class-rkc-admin-pages.php:273 includes/admin/class-rkc-admin-pages.php:873
+msgid "Details"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:838
+msgid "Diagnostics"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:471 includes/admin/class-rkc-admin-pages.php:474
+msgid "Disconnect"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:474
+msgid "Disconnect from ResellingKori and remove the saved key and secret?"
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:327
+msgid "Disconnected. The key and secret were removed from this site. Your product links and order history are kept."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:556
+msgid "Do not link automatically when the SKU matches but the product names look completely different (ask me instead)"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:551
+msgid "E-mail me when an order cannot be confirmed or ResellingKori reports a problem"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:381
+msgid "Enter the Key ID and secret that ResellingKori gave you. Nothing else is needed: the store, your sales agent and the delivery address for updates are all taken from the key."
+msgstr ""
+
+#: includes/class-rkc-connect.php:21
+msgid "Enter your Key ID and secret first."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:560
+msgid "Errors only"
+msgstr ""
+
+#: includes/class-rkc-plugin.php:39
+msgid "Every 15 minutes (ResellingKori)"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:365
+msgid "Every 15 minutes, status checks for orders you already sent (ResellingKori order numbers only)."
+msgstr ""
+
+#: includes/class-rkc-plugin.php:43
+msgid "Every minute (ResellingKori)"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:560
+msgid "Everything (for troubleshooting)"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:858
+msgid "Export CSV"
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:208
+msgid "Fees or adjustments"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:857
+msgid "Filter"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:647
+msgid "Filter products"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:306
+msgid "Finish"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-order.php:115
+msgid "Finish the setup"
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:190
+#, php-format
+msgid "Finished. Checked %1$s · unavailable %2$s"
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:188
+#, php-format
+msgid "Finished. Linked %1$s · need review %2$s · no SKU match %3$s"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:444
+msgid "Go to the dashboard"
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:172
+msgid "Has variations"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:485
+msgid "Help"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:440
+msgid "How to send an order"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:540
+msgid "If set, orders are blocked when ResellingKori reports a different agent for your key. ResellingKori never receives this address except to compare it."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:487
+msgid "If something does not work, open \"Logs & diagnostics\", copy the diagnostics (it never contains your secret) and send it to ResellingKori support."
+msgstr ""
+
+#: includes/class-rkc-privacy.php:41
+msgid "If the ResellingKori agent dashboard is switched on, orders that contain a ResellingKori product are also shown to the sales agent who runs our ResellingKori account: order number, status, items and amounts, the recipient's name and city and a partly hidden phone number. The e-mail address, the street address and the full phone number are not shown there."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:198
+msgid "In progress at ResellingKori"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:442
+msgid "In the \"ResellingKori\" box press \"Review and send\"."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:608
+msgid "Instructions carried out"
+msgstr ""
+
+#: includes/class-rkc-webhook.php:176
+msgid "Invalid challenge."
+msgstr ""
+
+#: includes/class-rkc-webhook.php:155
+msgid "Invalid event."
+msgstr ""
+
+#: includes/class-rkc-webhook.php:125
+msgid "Invalid request body."
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:206
+msgid "Items at your selling prices"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:563
+msgid "Keep log entries for (days)"
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:224
+msgid "Keep the order"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:160 includes/admin/class-rkc-admin-pages.php:457
+msgid "Key"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:391
+msgid "Key ID"
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:185
+msgid "Keywords"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:162
+msgid "Last checked"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-order.php:151
+msgid "Last update"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:618
+msgid "Let the dashboard send, cancel and link on this shop's behalf (leave off to only look)"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:852 includes/admin/class-rkc-admin-pages.php:869 includes/admin/class-rkc-admin-pages.php:871
+msgid "Level"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:751
+msgid "Link"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-order.php:166 includes/admin/class-rkc-admin.php:196
+msgid "Link needs review"
+msgstr ""
+
+#: includes/class-rkc-mapping.php:169 includes/class-rkc-workspace-exec.php:433
+msgid "Link the individual variations of a variable product, not the parent."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:413
+msgid "Link your products"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:144
+msgid "Link your products, send orders for fulfilment with your own selling prices, and get tracking back automatically. Setup takes about five minutes."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:642
+msgid "Linked"
+msgstr ""
+
+#. translators: %d: number of variations
+#: includes/admin/class-rkc-admin-ajax.php:252
+msgid "Linked."
+msgstr ""
+
+#. translators: %d: number of variations
+#: includes/admin/class-rkc-admin-ajax.php:251
+#, php-format
+msgid "Linked. %d other variation was matched by its attributes: please confirm it."
+msgid_plural "Linked. %d other variations were matched by their attributes: please confirm them."
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/class-rkc-connect.php:69
+msgid "Live status updates (webhook) are not active. The plugin will check ResellingKori for updates every 15 minutes instead."
+msgstr ""
+
+#. translators: %d: number of products
+#: includes/admin/class-rkc-admin-pages.php:438
+msgid "Live status updates are active"
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:160
+msgid "Live updates"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:161
+msgid "Live updates (webhook)"
+msgstr ""
+
+#. translators: %d: number of products
+#: includes/admin/class-rkc-admin-pages.php:438
+msgid "Live updates are not active; the plugin checks every 15 minutes"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:850
+msgid "Log"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:559
+msgid "Log detail"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:110
+msgid "Logs & diagnostics"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:558
+msgid "Logs and data"
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:201
+#, php-format
+msgid "Loss %s"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:417
+msgid "Match all by SKU now"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:663
+msgid "Match by SKU"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:666
+msgid "Match every unlinked product by SKU"
+msgstr ""
+
+#. translators: 1: linked, 2: need review, 3: no exact SKU match
+#: includes/admin/class-rkc-admin-ajax.php:325
+#, php-format
+msgid "Matched by SKU: %1$d linked. %2$d need your review because the names differ or the variation is unclear. %3$d have no exact SKU match at ResellingKori."
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:187
+#, php-format
+msgid "Matching… linked %1$s · need review %2$s · no SKU match %3$s"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:869 includes/admin/class-rkc-admin-pages.php:871
+msgid "Message"
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:186
+msgid "Name, SKU or ID"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:177
+msgid "Needs attention"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:644 includes/admin/class-rkc-admin-pages.php:742
+msgid "Needs review"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:265
+msgid "New: use your ResellingKori agent dashboard for this shop."
+msgstr ""
+
+#: includes/class-rkc-privacy.php:89
+msgid "No"
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:166
+msgid "No ResellingKori product has this SKU."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:866
+msgid "No log entries."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:733
+msgid "No longer available"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:790
+msgid "No orders here yet. Open an order in WooCommerce and use the \"ResellingKori\" box to send it."
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:167
+msgid "No products found. Try fewer or different words."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:670
+msgid "No products match this filter."
+msgstr ""
+
+#: includes/class-rkc-connect.php:63
+msgid "No valid sales agent is linked to this key at ResellingKori. You can map products, but orders cannot be placed until they link your agent account."
+msgstr ""
+
+#: includes/class-rkc-orders.php:214
+msgid "No valid sales agent is linked to your ResellingKori key, so orders cannot be placed. Ask ResellingKori to link your agent account."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:254
+msgid "No valid sales agent is linked to your key at ResellingKori. Orders cannot be placed until they link your agent account."
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:151
+msgid "None"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-order.php:149
+msgid "None (already paid)"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:560
+msgid "Normal (recommended)"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-order.php:170 includes/admin/class-rkc-admin.php:197
+msgid "Not a ResellingKori product"
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:162
+msgid "Not active (the plugin checks every 15 minutes)"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:75
+msgid "Not connected"
+msgstr ""
+
+#. translators: %s: product names
+#: includes/class-rkc-orders.php:246
+#, php-format
+msgid "Not connected with ResellingKori: %s. Map at least one product first."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:463
+msgid "Not connected."
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:175
+#, php-format
+msgid "Not in your product name: %s"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:643 includes/admin/class-rkc-admin-pages.php:746
+msgid "Not linked"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:196
+msgid "Not linked yet"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:268
+msgid "Not now"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:51
+msgid "Not sent"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:235
+msgid "Not set up — checking every 15 min instead"
+msgstr ""
+
+#: includes/class-rkc-workspace.php:1179
+msgid "Not switched on yet. Nothing is sent to ResellingKori until you switch it on."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:73 includes/admin/class-rkc-admin.php:157
+msgid "Not verified"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:233
+msgid "Not working — checking every 15 min instead"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:366
+msgid "Nothing else. There is no analytics, tracking or advertising. The log on this site masks phone numbers and e-mail addresses."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-ajax.php:109
+msgid "Nothing happened."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-order.php:191
+msgid "Nothing is sent twice. The plugin asks ResellingKori what it received."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:180
+msgid "Nothing needs your attention."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:206
+msgid "Nothing yet."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:550
+msgid "Notifications"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:588
+msgid "Off"
+msgstr ""
+
+#: includes/class-rkc-settings.php:66
+msgid "On hold"
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:109
+msgid "Open"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:441
+msgid "Open an order in WooCommerce > Orders."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:212
+msgid "Open the full log"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:417
+msgid "Open the product list"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:869 includes/admin/class-rkc-admin-pages.php:875 includes/class-rkc-privacy.php:79
+msgid "Order"
+msgstr ""
+
+#. translators: %s: order number
+#: includes/class-rkc-webhook.php:292
+#, php-format
+msgid "Order %s: ResellingKori reported a problem"
+msgstr ""
+
+#. translators: %s: order number
+#: includes/class-rkc-submit.php:463
+#, php-format
+msgid "Order %s: ResellingKori status is still unknown"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:856
+msgid "Order ID"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-ajax.php:98
+msgid "Order not found."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:425
+msgid "Order preferences"
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:211
+msgid "Order total"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:109 includes/admin/class-rkc-admin-pages.php:305
+msgid "Orders"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:414
+msgid "Orders can only be sent for products that are linked to a ResellingKori product. The plugin links by SKU first (exact match). For everything else it suggests ResellingKori products with similar names, and you choose."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:512
+msgid "Orders paid with any other method are sent as already paid: the courier collects only the delivery charge you confirm, if any."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:197
+msgid "Orders sent"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:605
+msgid "Orders shown in the dashboard"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:519
+msgid "Orders that were only partly sent (mixed orders) never change status."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:521
+msgid "Orders with products from other suppliers (mixed orders)"
+msgstr ""
+
+#. translators: %s: order status name
+#: includes/class-rkc-orders.php:228
+#, php-format
+msgid "Orders with status \"%s\" cannot be sent. Change the allowed statuses in Settings if needed."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:731 includes/admin/class-rkc-admin.php:170
+msgid "Out of stock"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:194
+msgid "Overview"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:695 includes/admin/class-rkc-admin-pages.php:814 includes/admin/class-rkc-admin-pages.php:880
+msgid "Pagination"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:510
+msgid "Payment"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:511
+msgid "Payment methods that mean \"cash on delivery\" (ids, comma separated)"
+msgstr ""
+
+#: includes/class-rkc-settings.php:64
+msgid "Pending"
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:194
+msgid "Please check:"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-ajax.php:64
+msgid "Please wait a moment before trying again."
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:178
+msgid "Possible"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:481
+msgid "Preferences"
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:150
+msgid "Press Ctrl+C to copy"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:587
+msgid "Problem"
+msgstr ""
+
+#: includes/class-rkc-settings.php:65
+msgid "Processing"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:555
+msgid "Product matching"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-ajax.php:88 includes/class-rkc-mapping.php:166
+msgid "Product not found."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:108 includes/admin/class-rkc-admin-pages.php:304
+msgid "Products"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:195
+msgid "Products linked"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:606
+msgid "Products shown in the dashboard"
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:200
+#, php-format
+msgid "Profit %s"
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:222
+msgid "Reason (optional)"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:204
+msgid "Recent activity"
+msgstr ""
+
+#: includes/class-rkc-privacy.php:129
+msgid "Recipient details were removed from the copies stored by the ResellingKori connector. ResellingKori keeps its own record of orders already sent; ask them to erase it."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-order.php:182
+msgid "Refresh status"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:47 includes/admin/class-rkc-admin-pages.php:781
+msgid "Refused"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:277
+msgid "Refused by ResellingKori"
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:154
+msgid "Reload the list"
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:164
+msgid "Remove the link for the selected products? Orders containing them will no longer be sent to ResellingKori until you link them again."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:472
+msgid "Removes the key and secret from this site. Your product links and order history are kept. Orders cannot be sent until you connect again."
+msgstr ""
+
+#. translators: %s: masked key id
+#: includes/admin/class-rkc-admin-pages.php:375
+msgid "Replace the key and secret"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:466
+msgid "Replace the key and secret (reconnect or key rotation)"
+msgstr ""
+
+#: includes/class-rkc-webhook.php:129
+msgid "Request timestamp is outside the allowed window."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-order.php:33 includes/admin/class-rkc-admin-order.php:54 includes/admin/class-rkc-admin-order.php:58 includes/admin/class-rkc-admin-order.php:168 includes/admin/class-rkc-admin-pages.php:113 includes/admin/class-rkc-admin-pages.php:793 includes/admin/class-rkc-admin-pages.php:803 includes/admin/class-rkc-admin.php:93 includes/admin/class-rkc-admin.php:95
+msgid "ResellingKori"
+msgstr ""
+
+#: includes/class-rkc-plugin.php:86
+msgid "ResellingKori Fulfillment Connector requires WooCommerce to be installed and active."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:351
+msgid "ResellingKori accepts orders in BDT only."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:543 includes/admin/class-rkc-admin-pages.php:594
+msgid "ResellingKori agent dashboard"
+msgstr ""
+
+#: includes/class-rkc-submit.php:199
+msgid "ResellingKori already had an order under this reference with different contents. It was linked to this order. Check the items before it ships, or cancel it and send again."
+msgstr ""
+
+#: includes/class-rkc-submit.php:200
+msgid "ResellingKori already held an order for this reference with different contents. It has been linked; please check it carefully."
+msgstr ""
+
+#: includes/class-rkc-submit.php:548
+msgid "ResellingKori answered the cancellation with something unexpected. Use \"Check status\"."
+msgstr ""
+
+#. translators: %d: HTTP status code
+#: includes/class-rkc-api-client.php:149
+#, php-format
+msgid "ResellingKori answered with HTTP %d."
+msgstr ""
+
+#: includes/class-rkc-submit.php:188
+msgid "ResellingKori answered with something this plugin did not expect."
+msgstr ""
+
+#: includes/class-rkc-workspace-exec.php:338
+msgid "ResellingKori answered with something this shop did not expect. Look at the order before you try again."
+msgstr ""
+
+#: includes/class-rkc-connect.php:39
+msgid "ResellingKori answered, but not with the information this plugin expects. Update the plugin, or contact ResellingKori."
+msgstr ""
+
+#. translators: %s: reason
+#: includes/class-rkc-submit.php:320
+#, php-format
+msgid "ResellingKori did not accept the order: %s"
+msgstr ""
+
+#: includes/class-rkc-connect.php:123
+msgid "ResellingKori did not accept this Key ID and secret. Copy both again exactly as they were shown when the key was issued (the secret is shown only once). If you no longer have the secret, ask ResellingKori to rotate the key."
+msgstr ""
+
+#: includes/class-rkc-api-client.php:101
+msgid "ResellingKori did not answer in time."
+msgstr ""
+
+#: includes/class-rkc-connect.php:136
+msgid "ResellingKori did not answer in time. Try again in a moment."
+msgstr ""
+
+#: includes/class-rkc-submit.php:542
+msgid "ResellingKori did not confirm the cancellation. Use \"Check status\" to see where the order stands, then try again."
+msgstr ""
+
+#: includes/class-rkc-submit.php:329
+msgid "ResellingKori did not confirm this order, so it may or may not have arrived. Nothing will be sent twice: the plugin checks with ResellingKori automatically, or press \"Check status\"."
+msgstr ""
+
+#: includes/class-rkc-connect.php:52
+msgid "ResellingKori has a different webhook address on file. Run \"Test connection\" to register this one."
+msgstr ""
+
+#: includes/class-rkc-submit.php:535 includes/class-rkc-workspace-exec.php:364
+msgid "ResellingKori has already started processing or shipped this order, so it can no longer be cancelled here. Contact ResellingKori."
+msgstr ""
+
+#: includes/class-rkc-submit.php:538
+msgid "ResellingKori has no order under this reference. Use \"Check status\"."
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:210
+msgid "ResellingKori has no separate field for this amount, so it is sent together with the delivery charge."
+msgstr ""
+
+#: includes/class-rkc-submit.php:467
+msgid "ResellingKori has not confirmed this order yet. It will be checked again; nothing is sent twice."
+msgstr ""
+
+#: includes/class-rkc-workspace.php:1190
+msgid "ResellingKori has not switched the agent dashboard on for stores yet. Nothing is shown there until it does; this plugin keeps checking."
+msgstr ""
+
+#: includes/class-rkc-orders.php:211
+msgid "ResellingKori is not connected yet. Finish the setup in WooCommerce > ResellingKori."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-order.php:113
+msgid "ResellingKori is not connected."
+msgstr ""
+
+#: includes/class-rkc-api-client.php:35
+msgid "ResellingKori is not connected. Open WooCommerce > ResellingKori and finish the setup."
+msgstr ""
+
+#: includes/class-rkc-submit.php:438
+msgid "ResellingKori is still processing this order."
+msgstr ""
+
+#: includes/class-rkc-workspace.php:1196
+msgid "ResellingKori needs to update before this version of the plugin can sync. This plugin keeps checking."
+msgstr ""
+
+#. translators: %s: currency code
+#: includes/class-rkc-orders.php:231
+#, php-format
+msgid "ResellingKori only accepts orders in BDT (this order is in %s)."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:350
+msgid "ResellingKori only sends live updates to HTTPS addresses. Without HTTPS the plugin falls back to checking every 15 minutes."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-order.php:142
+msgid "ResellingKori order"
+msgstr ""
+
+#: includes/class-rkc-privacy.php:38
+msgid "ResellingKori orders"
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:199
+#, php-format
+msgid "ResellingKori price %s"
+msgstr ""
+
+#. translators: 1: old price, 2: new price
+#: includes/admin/class-rkc-admin-order.php:242
+#, php-format
+msgid "ResellingKori price changed from %1$s to %2$s."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:674 includes/admin/class-rkc-admin-pages.php:716
+msgid "ResellingKori product"
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:202
+#, php-format
+msgid "ResellingKori product: %s"
+msgstr ""
+
+#: includes/class-rkc-privacy.php:80
+msgid "ResellingKori reference"
+msgstr ""
+
+#. translators: 1: message, 2: link
+#: includes/class-rkc-webhook.php:293
+#, php-format
+msgid ""
+"ResellingKori reported a problem with order %1$s:\n"
+"%2$s\n"
+"\n"
+"%3$s"
+msgstr ""
+
+#. translators: %s: message
+#: includes/class-rkc-webhook.php:382
+#, php-format
+msgid "ResellingKori reported a problem: %s"
+msgstr ""
+
+#: includes/class-rkc-connect.php:66
+msgid "ResellingKori reports a currency other than BDT. Contact ResellingKori before placing orders."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-order.php:135
+msgid "ResellingKori reports a problem:"
+msgstr ""
+
+#: includes/class-rkc-submit.php:479
+msgid "ResellingKori reports that this order was cancelled. You can send it again."
+msgstr ""
+
+#: includes/class-rkc-connect.php:129
+msgid "ResellingKori requires a newer version of this plugin. Update it and try again."
+msgstr ""
+
+#: includes/class-rkc-api-client.php:129 includes/class-rkc-workspace.php:948
+msgid "ResellingKori returned a response this plugin cannot read. Update the plugin or contact ResellingKori."
+msgstr ""
+
+#: includes/class-rkc-mapping.php:178
+msgid "ResellingKori returned an unexpected response for that product."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:115
+msgid "ResellingKori sections"
+msgstr ""
+
+#. translators: %s: status
+#: includes/class-rkc-webhook.php:376 includes/class-rkc-webhook.php:398
+#, php-format
+msgid "ResellingKori status: %s."
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:221
+msgid "ResellingKori stops fulfilling it. You can send a corrected order afterwards."
+msgstr ""
+
+#: includes/class-rkc-privacy.php:47 includes/class-rkc-privacy.php:55 includes/class-rkc-privacy.php:92
+msgid "ResellingKori submissions"
+msgstr ""
+
+#. translators: 1: courier, 2: tracking number
+#: includes/class-rkc-webhook.php:379
+#, php-format
+msgid "ResellingKori tracking: %1$s %2$s"
+msgstr ""
+
+#: includes/class-rkc-settings.php:69
+msgid "Returned"
+msgstr ""
+
+#. translators: %d: number of products
+#: includes/admin/class-rkc-admin-pages.php:285
+msgid "Review"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-order.php:198
+msgid "Review and send"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-order.php:198
+msgid "Review and send again"
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:192
+msgid "Review before sending"
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:209
+msgid "Rounding"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:463
+msgid "Run the setup"
+msgstr ""
+
+#. translators: 1: SKU, 2: ID
+#: includes/admin/class-rkc-admin-pages.php:710
+#, php-format
+msgid "SKU: %1$s · ID %2$d"
+msgstr ""
+
+#. translators: 1: SKU, 2: product id, 3: variation part
+#: includes/admin/class-rkc-admin-pages.php:725
+#, php-format
+msgid "SKU: %1$s · ID %2$d%3$s"
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:173
+#, php-format
+msgid "SKU: %1$s · ID %2$s"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:839
+msgid "Safe to share with support. It never contains your secret, key or signatures."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:159 includes/admin/class-rkc-admin-pages.php:459 includes/admin/class-rkc-admin.php:159
+msgid "Sales agent"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:538
+msgid "Sales agent check (optional)"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:620
+msgid "Save"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:394 includes/admin/class-rkc-admin-pages.php:568
+msgid "Save and continue"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:568
+msgid "Save preferences"
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:320
+msgid "Saved. The secret is stored encrypted and will not be shown again. Now verify the connection."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-order.php:153
+msgid "Scope"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:661 includes/admin/class-rkc-admin-pages.php:857 includes/admin/class-rkc-admin.php:153
+msgid "Search"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:661
+msgid "Search by name or exact SKU"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:661
+msgid "Search your products by name or exact SKU"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:392
+msgid "Secret"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:266
+msgid "See the shop's orders that contain ResellingKori products, send them, and link products from your agent dashboard, without opening WooCommerce. This shares a short summary of those orders (order number, items, amounts, the customer's name and city and a partly hidden phone number) with your ResellingKori agent account."
+msgstr ""
+
+#. translators: %d: number of products
+#: includes/admin/class-rkc-admin-pages.php:289
+msgid "See which"
+msgstr ""
+
+#. translators: %s: product name
+#: includes/admin/class-rkc-admin-pages.php:703
+#, php-format
+msgid "Select %s"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:674
+msgid "Select all on this page"
+msgstr ""
+
+#: includes/class-rkc-orders.php:292
+msgid "Select at least one ResellingKori item to send."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:800
+msgid "Selected items"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-order.php:153
+msgid "Selected items only. This order's own status is not changed by ResellingKori."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:662
+msgid "Selected:"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:552
+msgid "Send to (blank = the site administrator e-mail)"
+msgstr ""
+
+#: includes/class-rkc-orders.php:250
+msgid "Sending this order is blocked."
+msgstr ""
+
+#: includes/class-rkc-workspace-exec.php:328
+msgid "Sending was requested from the ResellingKori agent dashboard."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:426
+msgid "Sensible defaults are already selected. Change them only if you need to."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-order.php:168 includes/admin/class-rkc-admin-pages.php:41 includes/admin/class-rkc-admin-pages.php:781 includes/admin/class-rkc-admin-pages.php:793 includes/admin/class-rkc-admin-pages.php:802
+msgid "Sent"
+msgstr ""
+
+#: includes/class-rkc-privacy.php:82
+msgid "Sent on"
+msgstr ""
+
+#. translators: %s: ResellingKori order number
+#: includes/admin/class-rkc-admin-ajax.php:416
+#, php-format
+msgid "Sent to ResellingKori as order #%s."
+msgstr ""
+
+#. translators: %s: ResellingKori order number
+#: includes/class-rkc-submit.php:245
+#, php-format
+msgid "Sent to ResellingKori as order %s (selected items only)."
+msgstr ""
+
+#. translators: %s: ResellingKori order number
+#: includes/class-rkc-submit.php:246
+#, php-format
+msgid "Sent to ResellingKori as order %s."
+msgstr ""
+
+#: includes/class-rkc-submit.php:254
+msgid "Sent to ResellingKori."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:111 includes/admin/class-rkc-admin-pages.php:171
+msgid "Settings"
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:338
+msgid "Settings saved."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:107
+msgid "Setup"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:308
+msgid "Setup progress"
+msgstr ""
+
+#: includes/class-rkc-settings.php:67
+msgid "Shipped"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:546 includes/admin/class-rkc-admin-pages.php:617
+msgid "Show this shop's ResellingKori orders and products in my ResellingKori agent dashboard"
+msgstr ""
+
+#: includes/class-rkc-privacy.php:89
+msgid "Shown in the ResellingKori agent dashboard"
+msgstr ""
+
+#: includes/class-rkc-submit.php:155 includes/class-rkc-submit.php:158
+msgid "Someone else is sending this order right now. Reload the page to see the result."
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:148
+msgid "Something went wrong. Reload the page and try again."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:146
+msgid "Start setup"
+msgstr ""
+
+#: includes/class-rkc-privacy.php:81
+msgid "State"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:157 includes/admin/class-rkc-admin-pages.php:456 includes/admin/class-rkc-admin-pages.php:793 includes/admin/class-rkc-admin-pages.php:804
+msgid "Status"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-ajax.php:478
+msgid "Status refreshed."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:527
+msgid "Status updates from ResellingKori"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:486
+msgid "Step-by-step guides (setup, sending orders, troubleshooting) are in the \"docs\" folder that came with this plugin."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:458 includes/admin/class-rkc-admin.php:158
+msgid "Store"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:158
+msgid "Store at ResellingKori"
+msgstr ""
+
+#. translators: 1: store, 2: agent
+#: includes/admin/class-rkc-admin-pages.php:404
+#, php-format
+msgid "Store: %1$s · Sales agent: %2$s"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:407
+msgid "Stuck? The most common cause is a typing mistake in the secret. Go back and enter it again."
+msgstr ""
+
+#: includes/class-rkc-submit.php:404
+msgid "Submission not found."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:523
+msgid "Suggest no delivery charge (I will enter it)"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:524
+msgid "Suggest the order's shipping charge"
+msgstr ""
+
+#: includes/class-rkc-privacy.php:39
+msgid "Suggested text for your privacy policy:"
+msgstr ""
+
+#: includes/class-rkc-workspace.php:1180
+msgid "Switched off. Nothing is sent to ResellingKori."
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:381
+msgid "Switched on."
+msgstr ""
+
+#: includes/class-rkc-workspace.php:1206
+msgid "Switched on. The first sync happens within a minute."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:619
+msgid "Switching the first box off tells ResellingKori to delete everything it holds from this shop. Deactivating or deleting the plugin does not contact ResellingKori: switch it off first if you want the data removed at once; otherwise it expires there."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:623
+msgid "Sync now"
+msgstr ""
+
+#. translators: 1: orders, 2: products, 3: instructions
+#: includes/admin/class-rkc-admin.php:370
+#, php-format
+msgid "Synced. Reported %1$d orders and %2$d products; carried out %3$d instructions."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:170 includes/admin/class-rkc-admin-pages.php:461
+msgid "Test connection"
+msgstr ""
+
+#: includes/class-rkc-mapping.php:191
+msgid "That ResellingKori product has variations. Select the exact variation."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:503
+msgid "The \"Send\" button is offered only for orders in these statuses."
+msgstr ""
+
+#: includes/class-rkc-config.php:98
+msgid "The Key ID looks wrong. It starts with \"rkk_\" and is shown next to the secret when ResellingKori issues your key."
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:181
+msgid "The SKU matches but the names look different. Check carefully before you use it."
+msgstr ""
+
+#: includes/class-rkc-workspace.php:1193
+msgid "The agent dashboard is switched off at ResellingKori. This plugin keeps checking."
+msgstr ""
+
+#: includes/class-rkc-workspace-exec.php:302
+msgid "The amounts are not what was confirmed in the dashboard, so nothing was sent. Open the order again and check the amounts."
+msgstr ""
+
+#: includes/class-rkc-api-client.php:124
+msgid "The answer from ResellingKori could not be verified, so it was ignored. If this keeps happening, a proxy or security plugin may be changing the response."
+msgstr ""
+
+#. translators: %s: amount
+#: includes/class-rkc-orders.php:402
+#, php-format
+msgid "The cash to collect is more than ResellingKori allows (%s)."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:251
+msgid "The connection has not been verified yet."
+msgstr ""
+
+#. translators: %s: amount
+#: includes/class-rkc-submit.php:248
+#, php-format
+msgid "The courier will collect %s."
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:204
+#, php-format
+msgid "The customer already received a credit or discount of %s. Subtract it, so the courier does not collect it."
+msgstr ""
+
+#. translators: %s: amount
+#: includes/class-rkc-orders.php:398
+#, php-format
+msgid "The delivery charge is more than ResellingKori allows (%s)."
+msgstr ""
+
+#: includes/class-rkc-orders.php:346
+msgid "The delivery charge is not a valid amount (use numbers with at most 2 decimals)."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:539
+msgid "The e-mail of the sales agent you expect to be linked to your key"
+msgstr ""
+
+#: includes/class-rkc-webhook.php:188
+msgid "The event has no order."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-order.php:131
+msgid "The items of this order changed after it was sent. ResellingKori still has the original. Cancel it there and send the corrected order."
+msgstr ""
+
+#: includes/class-rkc-workspace-exec.php:312 includes/class-rkc-workspace-exec.php:317
+msgid "The items to send are not what was confirmed in the dashboard, so nothing was sent. Open the order again and check them."
+msgstr ""
+
+#: includes/class-rkc-orders.php:225
+msgid "The last attempt to send this order did not get a clear answer. Press \"Check status\" so nothing is sent twice."
+msgstr ""
+
+#: includes/class-rkc-workspace.php:1199
+msgid "The last sync did not work. This plugin tries again automatically."
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:425
+msgid "The log was cleared."
+msgstr ""
+
+#: includes/class-rkc-workspace-exec.php:272
+msgid "The order changed after it was confirmed in the dashboard, so nothing was sent. Open the order again and confirm."
+msgstr ""
+
+#: includes/class-rkc-webhook.php:263
+msgid "The order is being checked. Try again shortly."
+msgstr ""
+
+#: includes/class-rkc-webhook.php:257
+msgid "The order is still being recorded. Try again shortly."
+msgstr ""
+
+#: includes/class-rkc-submit.php:408
+msgid "The order no longer exists."
+msgstr ""
+
+#: includes/class-rkc-submit.php:99
+msgid "The order or the amounts changed after you reviewed them. Review the order again, then confirm."
+msgstr ""
+
+#. translators: 1: current status, 2: wanted status
+#: includes/class-rkc-webhook.php:396
+#, php-format
+msgid "The order status was left as \"%1$s\" (ResellingKori status would map to \"%2$s\")."
+msgstr ""
+
+#. translators: %s: amount
+#: includes/class-rkc-orders.php:406
+#, php-format
+msgid "The order total is more than ResellingKori allows (%s)."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-ajax.php:459
+msgid "The order was cancelled at ResellingKori."
+msgstr ""
+
+#. translators: 1: order number, 2: link
+#: includes/class-rkc-submit.php:464
+#, php-format
+msgid ""
+"The plugin could not confirm whether ResellingKori received order %1$s. It will not send it again by itself.\n"
+"\n"
+"Open the order and press \"Check status\":\n"
+"%2$s"
+msgstr ""
+
+#: includes/class-rkc-submit.php:173
+msgid "The recipient details of this order were erased at the customer's request, so it can no longer be sent."
+msgstr ""
+
+#: includes/class-rkc-orders.php:560
+msgid "The review has expired or the order changed. Review the order again before sending."
+msgstr ""
+
+#: includes/class-rkc-orders.php:218
+msgid "The sales agent linked to your ResellingKori key is not the agent you expect (see Settings). Orders are paused until this is resolved, so the commission does not go to the wrong agent."
+msgstr ""
+
+#: includes/class-rkc-connect.php:60
+msgid "The sales agent on this key is not the agent you expect. Orders will not be sent. Check the key with ResellingKori, or correct the expected agent email in Settings."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:257
+msgid "The saved secret cannot be decrypted (the WordPress salts changed?). Enter the key and secret again in Settings."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:259
+msgid "The saved secret cannot be decrypted (the WordPress salts or RKC_ENCRYPTION_KEY changed). Enter the key and secret again in Settings."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:393
+msgid "The secret is encrypted before it is saved. It is sent only to ResellingKori, as a signature, never as text."
+msgstr ""
+
+#: includes/class-rkc-config.php:101
+msgid "The secret looks wrong. Copy it again exactly as ResellingKori showed it (letters, numbers, - and _ only, no spaces)."
+msgstr ""
+
+#: includes/class-rkc-submit.php:386
+msgid "The send was interrupted before anything was transmitted. You can send the order again."
+msgstr ""
+
+#: includes/class-rkc-submit.php:388
+msgid "The send was interrupted; ResellingKori may or may not have received the order."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:349
+msgid "The server can encrypt the secret (PHP sodium)"
+msgstr ""
+
+#: includes/class-rkc-workspace-exec.php:204
+msgid "The shop owner has switched off sending, cancelling and linking from the agent dashboard. Nothing was changed."
+msgstr ""
+
+#: includes/class-rkc-submit.php:238
+msgid "The state of this order changed while it was being sent. Reload the page."
+msgstr ""
+
+#: includes/class-rkc-submit.php:169
+msgid "The stored order snapshot is unreadable."
+msgstr ""
+
+#: includes/class-rkc-workspace.php:737
+msgid "The sync stopped on an unexpected error. See the log."
+msgstr ""
+
+#: includes/class-rkc-submit.php:415 includes/class-rkc-workspace-exec.php:413
+msgid "There is nothing to check for this order."
+msgstr ""
+
+#: includes/class-rkc-orders.php:292
+msgid "There is nothing to send."
+msgstr ""
+
+#: includes/class-rkc-connect.php:125
+msgid "This key has been revoked by ResellingKori. Ask them for a new key and enter it in Settings."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:400
+msgid "This makes a real signed request to ResellingKori and shows which store and sales agent your key belongs to. Check that they are yours."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-order.php:200
+msgid "This order also contains products from other suppliers. You will choose which items to send."
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:195
+msgid "This order also has products from other suppliers. Tick the items you want ResellingKori to deliver."
+msgstr ""
+
+#: includes/class-rkc-workspace-exec.php:278
+msgid "This order cannot be sent right now."
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:193
+msgid "This order cannot be sent yet:"
+msgstr ""
+
+#: includes/class-rkc-workspace-exec.php:275
+msgid "This order has already been sent, or is being checked."
+msgstr ""
+
+#: includes/class-rkc-orders.php:222 includes/class-rkc-submit.php:120
+msgid "This order has already been submitted to ResellingKori."
+msgstr ""
+
+#: includes/class-rkc-orders.php:409
+msgid "This order has more lines than ResellingKori accepts in one order."
+msgstr ""
+
+#: includes/class-rkc-workspace.php:439
+msgid "This order has more than 100 lines, which the agent dashboard cannot show. Send it from the shop's own order screen."
+msgstr ""
+
+#: includes/class-rkc-orders.php:239
+msgid "This order has no products to fulfil."
+msgstr ""
+
+#: includes/class-rkc-submit.php:425 includes/class-rkc-submit.php:445
+msgid "This order is already being checked. Reload in a moment."
+msgstr ""
+
+#: includes/class-rkc-workspace-exec.php:358
+msgid "This order is not active at ResellingKori, so there is nothing to cancel."
+msgstr ""
+
+#: includes/class-rkc-submit.php:525
+msgid "This order is not currently active at ResellingKori."
+msgstr ""
+
+#: includes/class-rkc-workspace-exec.php:241
+msgid "This order no longer exists in the shop."
+msgstr ""
+
+#: includes/class-rkc-workspace-exec.php:268
+msgid "This order no longer has a ResellingKori product, so nothing was sent."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-ajax.php:467
+msgid "This order was not sent to ResellingKori."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-ajax.php:443
+msgid "This order was not sent yet."
+msgstr ""
+
+#: includes/class-rkc-workspace-exec.php:361
+msgid "This order was replaced at ResellingKori after you opened it, so nothing was cancelled. Open it again."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:344
+msgid "This plugin connects your WooCommerce store to ResellingKori so that you can sell ResellingKori products under your own prices and have each order fulfilled for you."
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:165
+msgid "This product has no SKU, so there is nothing to match exactly."
+msgstr ""
+
+#: includes/class-rkc-workspace-exec.php:466
+msgid "This product is not linked any more, so there is nothing to confirm."
+msgstr ""
+
+#: includes/class-rkc-workspace-exec.php:254
+msgid "This product no longer exists in the shop."
+msgstr ""
+
+#: includes/class-rkc-webhook.php:151
+msgid "This request was already received."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:134
+msgid "This server cannot encrypt the API secret (PHP sodium extension is missing). Ask your host to enable it before connecting."
+msgstr ""
+
+#: includes/class-rkc-config.php:104
+msgid "This server cannot encrypt the secret (the PHP sodium extension is missing). Ask your host to enable it."
+msgstr ""
+
+#: includes/class-rkc-workspace-exec.php:191 includes/class-rkc-workspace-exec.php:237 includes/class-rkc-workspace-exec.php:250 includes/class-rkc-workspace-exec.php:438
+msgid "This shop could not read the instruction."
+msgstr ""
+
+#: includes/class-rkc-workspace-exec.php:228
+msgid "This shop does not know this instruction."
+msgstr ""
+
+#: includes/class-rkc-workspace-exec.php:124
+msgid "This shop hit an unexpected error while carrying this out. Look at the order to see whether anything happened before you try again."
+msgstr ""
+
+#: includes/class-rkc-workspace-exec.php:201
+msgid "This shop is not connected to ResellingKori right now. Nothing was changed."
+msgstr ""
+
+#: includes/class-rkc-workspace-exec.php:198
+msgid "This shop picked the instruction up too late, so it was not carried out. Nothing was changed. Try again."
+msgstr ""
+
+#: includes/class-rkc-workspace-exec.php:89
+msgid "This shop received the instruction but stopped before it could report. Look at the order to see what happened before you try again."
+msgstr ""
+
+#: includes/class-rkc-workspace-exec.php:226
+msgid "This shop will send everything again."
+msgstr ""
+
+#: includes/class-rkc-connect.php:134
+msgid "This site could not reach ResellingKori. Check that your server can make outgoing HTTPS requests, then try again."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:869 includes/admin/class-rkc-admin-pages.php:871
+msgid "Time"
+msgstr ""
+
+#: includes/class-rkc-webhook.php:107
+msgid "Too many invalid requests. Try again later."
+msgstr ""
+
+#: includes/class-rkc-connect.php:132
+msgid "Too many requests in a short time. Wait a few minutes and try again."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-order.php:145 includes/admin/class-rkc-admin-pages.php:793 includes/admin/class-rkc-admin-pages.php:808
+msgid "Tracking"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:267
+msgid "Turn on"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-ajax.php:201
+msgid "Type at least two characters."
+msgstr ""
+
+#: includes/class-rkc-webhook.php:110 includes/class-rkc-webhook.php:118 includes/class-rkc-webhook.php:121 includes/class-rkc-webhook.php:133 includes/class-rkc-webhook.php:143 includes/class-rkc-webhook.php:147 includes/class-rkc-webhook.php:167
+msgid "Unauthorized."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:645
+msgid "Unavailable at ResellingKori"
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:388
+msgid "Understood. Nothing is shared. You can switch the agent dashboard on later in Settings."
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:283
+msgid "Unknown action."
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:179
+msgid "Unlikely"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:665 includes/admin/class-rkc-admin-pages.php:756
+msgid "Unlink"
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:168
+msgid "Use this product"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:303
+msgid "Verify"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:401
+msgid "Verify connection"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:251
+msgid "Verify now"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:399
+msgid "Verify the connection"
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:177
+msgid "Very likely"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:586
+msgid "Waiting"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:45 includes/admin/class-rkc-admin-pages.php:781
+msgid "Waiting for confirmation"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:277
+msgid "Waiting for confirmation from ResellingKori"
+msgstr ""
+
+#: includes/class-rkc-workspace.php:1185
+msgid "Waiting for the connection to ResellingKori to be verified."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:607
+msgid "Waiting to be reported"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:560
+msgid "Warnings and errors"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:460
+msgid "Webhook address"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:301 includes/admin/class-rkc-admin-pages.php:343
+msgid "Welcome"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:362
+msgid "What information is sent to ResellingKori?"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:467
+msgid "When ResellingKori rotates or re-issues your key you receive a new Key ID and secret. Enter them here, then press \"Test connection\". The old key keeps working only for the grace period ResellingKori set, so do this promptly."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:522
+msgid "When an order contains some ResellingKori products and some others, you choose which items to send. This sets the delivery charge suggested for that parcel."
+msgstr ""
+
+#: includes/class-rkc-privacy.php:40
+msgid "When we fulfil an order through our supplier ResellingKori, we send them the recipient name, phone number, delivery address, optional e-mail address, the items ordered and the amounts, so that they can pack and deliver the order. We keep a copy of what we sent for our records and to prevent duplicate orders."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:364
+msgid "When you look for matching products: the product names or SKUs you search for."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:363
+msgid "When you press \"Send\" on an order: the recipient name, phone, address, optional e-mail, the items (SKU, name, quantity, your selling price), the amounts and the customer note."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:502
+msgid "Which orders may be sent"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:348
+msgid "WooCommerce is active"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-ajax.php:106
+msgid "WooCommerce is not active."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:585
+msgid "Working"
+msgstr ""
+
+#. translators: %s: how long ago, e.g. "2 minutes"
+#: includes/class-rkc-workspace.php:1203
+#, php-format
+msgid "Working. Last synced %s ago."
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:147
+msgid "Working…"
+msgstr ""
+
+#: includes/class-rkc-privacy.php:89
+msgid "Yes"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:361
+msgid "You also need your Key ID and secret. ResellingKori issues them to you (the secret is shown only once, so keep it safe)."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:434
+msgid "You are all set"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:420
+msgid "You can do this later; nothing is sent automatically. Matches with very different names are never linked without your review."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-ajax.php:57 includes/admin/class-rkc-admin.php:286
+msgid "You do not have permission to do this."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-order.php:207
+msgid "You do not have permission to send orders."
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:267
+msgid "You do not have permission to view this page."
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:198
+#, php-format
+msgid "You sell at %s"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:575
+msgid "Your ResellingKori agent dashboard can then list the orders of this shop that contain ResellingKori products, and let you send them, cancel them and link products from there. For that, this shop sends ResellingKori a short summary of those orders: order number, status, items and amounts, the customer's name and city and a partly hidden phone number. The e-mail address, the street address and the complete phone number are never included; they leave the shop only when an order is sent, as before. You can switch this off at any time and everything is deleted at ResellingKori."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:565
+msgid "Your key and secret are always removed when the plugin is deleted."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:793 includes/admin/class-rkc-admin-pages.php:798
+msgid "Your order"
+msgstr ""
+
+#. translators: %s: product name
+#: includes/admin/class-rkc-admin-pages.php:674 includes/admin/class-rkc-admin-pages.php:704
+msgid "Your product"
+msgstr ""
+
+#: includes/admin/class-rkc-admin.php:215
+msgid "Your profit on the items"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-ajax.php:54
+msgid "Your session expired. Reload the page and try again."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:350
+msgid "Your site uses HTTPS"
+msgstr ""
+
+#: includes/class-rkc-connect.php:127
+msgid "Your store account is disabled at ResellingKori. Contact them to re-enable it."
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:351
+msgid "Your store currency is BDT"
+msgstr ""
+
+#: includes/class-rkc-orders.php:196
+msgid "address"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:737
+msgid "by SKU"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:737
+msgid "by hand"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:737
+msgid "by name"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:737
+msgid "by variation"
+msgstr ""
+
+#: includes/class-rkc-orders.php:190
+msgid "customer name"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:415
+msgid "linked"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:415
+msgid "not linked"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:160 includes/admin/class-rkc-admin-pages.php:457
+msgid "secret saved (hidden)"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-order.php:91
+msgid "selected items only"
+msgstr ""
+
+#: includes/class-rkc-orders.php:193
+msgid "valid phone number"
+msgstr ""
+
+#: includes/admin/class-rkc-admin-pages.php:515 includes/admin/class-rkc-admin-pages.php:530
+msgid "— Don't change —"
+msgstr ""
+

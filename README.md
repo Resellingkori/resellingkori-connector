@@ -1,146 +1,73 @@
-# ResellingKori Connector – WooCommerce Plugin
+# ResellingKori Fulfillment Connector
 
-Connect your WooCommerce store to [ResellingKori](https://resellingkori.com) and fulfill orders automatically.
+Version 1.1.0 · License GPL-2.0-or-later (`license.txt`) · Requires WordPress 6.0+, PHP 7.4+, WooCommerce 7.0+ (HPOS compatible)
 
-Install this plugin on **your store** (the reseller's site). ResellingKori handles packing, shipping, and cash collection — you keep the profit.
+Connect your WooCommerce shop to **resellingkori.com**. You keep selling at your own prices; ResellingKori packs and ships the order to your customer, and the status and tracking number come back to your shop by themselves.
 
-> **This is the Connector plugin for reseller stores.**  
-> It connects your WooCommerce shop to resellingkori.com.
+## What it does
 
----
-
-## Requirements
-
-- WordPress 6.0 or higher
-- WooCommerce (HPOS supported)
-- PHP 7.4 or higher
-- An active API key from ResellingKori
-
----
-
-## Download
-
-Go to the [**Releases**](https://github.com/Resellingkori/resellingkori-connector/releases) tab and download the latest `.zip` file.
-
----
-
-## Installation (5 minutes)
-
-1. **Plugins → Add New → Upload Plugin** → select the ZIP → **Activate**
-2. Go to **WooCommerce → ResellingKori → Settings**
-3. Paste your **API Key** and **Secret** from ResellingKori → **Save** → **Test Connection**
-4. **Product Mapping** tab → **Auto-match all by SKU**, then map the rest manually
-5. Open any order → **ResellingKori** box → **Send to ResellingKori**
-
----
-
-## Product Matching
-
-| Method | How it works |
+| You want to… | The connector… |
 |---|---|
-| **Exact SKU** | Automatically matched. Flagged for review if names look unrelated. |
-| **Keyword suggestions** | Searches ResellingKori by product name keywords, ranked by similarity (High/Medium/Low). Never auto-confirmed. |
-| **Manual** | Enter a ResellingKori product ID or SKU directly. |
+| Know which of your products ResellingKori sells | Matches them **by exact SKU first**. For products without a SKU it suggests ResellingKori products from the **product-name keywords**. You can also search by hand. Nothing is linked from a *suggestion* until you click. |
+| Sell above ResellingKori's price | Sends **your selling price** with the order. ResellingKori records it as the SalesKing *set price* next to its own *original price*, so your agent dashboard and commission work exactly like an order the agent placed by hand. ResellingKori's own price always comes from ResellingKori – it can't be changed from your side. |
+| Ship an order that contains products from other suppliers too | If **some** items of an order are not linked, a "send only the ResellingKori items" choice appears (and only then). The rest of the order stays yours; your order status is never changed by a partial shipment. |
+| Be sure an order is never sent twice | Every send is reviewed and confirmed on screen. A double click, two staff members, a lost internet connection or a crash can never create two orders at ResellingKori. If the answer gets lost, the connector **asks** ResellingKori instead of guessing. |
+| Follow the delivery | Status, courier and tracking number arrive by signed webhook (and, as a fallback, by a check every 15 minutes for orders that are still open). They show in the ResellingKori box on the order and, if you choose, change your order's status. |
+| Fix a mistake | **Cancel** the order at ResellingKori while it has not been processed, correct your order and **send it again**. |
+| Let your sales agent do it from the ResellingKori dashboard *(optional, new in 1.1.0)* | When you switch it on, your agent sees this shop's orders that contain ResellingKori products on a separate **ResellingKori** page in the agent dashboard – with ResellingKori's price next to yours – and can send, cancel and check them and link products from there. Your shop does the work itself and re-checks everything first; nothing is collected until you say yes (see *Privacy* and `docs/AGENT_GUIDE.md`). |
 
-Variations are mapped one-to-one; matching variations are linked automatically after the first one.
+## Before you start
 
----
+1. A **ResellingKori key and secret** for your shop. They belong to your sales-agent account; ask ResellingKori. You never type your agent's password into the plugin. (*Settings* has an optional **Sales agent check** where you may type the e-mail of the agent you expect; it is used only to compare with what ResellingKori reports.)
+2. Orders that go to ResellingKori must be in **BDT** (৳).
+3. For automatic status updates your shop should be reachable over **HTTPS**. Without it the connector still works; it checks ResellingKori regularly instead.
 
-## Prices & Money
+## Set-up in six steps
 
-- Your customer's price (after discounts) is sent as the **set price** to ResellingKori
-- Your profit = your selling price − ResellingKori's catalogue price
-- Prices below ResellingKori's price are refused with a clear error
-- For cash-on-delivery: courier collects the full order total; your delivery charge is sent as a delivery line
+Open **WooCommerce → ResellingKori**. The set-up guide remembers where you stopped.
 
----
+1. **Welcome** – what will be shared and what will not (see *Privacy* below).
+2. **Connect** – paste the *Key ID* and the *Secret*. Nothing else.
+3. **Verify** – the connector makes a real, signed test call and shows the **store name and the sales agent** your key belongs to. Check that it is the agent you expect.
+4. **Products** – link your products (SKU matches first).
+5. **Orders** – preferences: which order statuses can be sent, what happens to the order after sending, the delivery charge suggested for partial parcels, notifications.
+6. **Finish.**
 
-## Mixed Orders (some items from ResellingKori, some not)
+## Sending an order
 
-| Items | What happens |
+Open the order in WooCommerce. The **ResellingKori** box shows:
+
+* every item, whether it is linked, its ResellingKori price and your profit or loss on it;
+* for orders with unlinked items: tick the items you want ResellingKori to send;
+* the delivery charge (the one amount you may change), what the customer has already paid, and **the cash the courier will collect**;
+* the delivery address.
+
+Press **Review and send**, read the summary, press **Confirm and send to ResellingKori**. If anything changed in the meantime (prices, stock, the order itself) the connector tells you and asks you to review again.
+
+If the answer from ResellingKori gets lost, the box says **"not confirmed"** and offers **Check status**. The connector also checks by itself, a few times, with growing pauses.
+
+## Security in one paragraph
+
+Every request is signed with HMAC-SHA256 using your secret; the secret itself is **never sent**, never put in a URL, a page, a log or an e-mail, and is stored encrypted. ResellingKori decides *which shop and which agent* a request belongs to from the key – never from anything in the request. Replays and old requests are rejected. Webhooks are verified the same way. Read `docs/SECURITY.md` for details and limits.
+
+## Privacy
+
+What is sent to ResellingKori when you send an order: the items (ResellingKori product id, SKU, name, quantity, **your** selling price), the recipient's **name, phone, delivery address**, the **e-mail** if the order has one, the order note, the payment figures (delivery charge, prepaid, cash to collect), and your store's order number. While connecting, ResellingKori also receives the address of your shop's webhook endpoint and, only if you typed one, the expected agent e-mail (for comparison). Product matching sends SKUs or product-name keywords. **Only if you switch the agent dashboard on**, the shop also reports a short summary of the orders that contain ResellingKori products (order number, status, items and amounts, the recipient's name and city and a partly hidden phone number – never the e-mail, street address or full phone number) and of your product list (name, SKU, price, link state) to ResellingKori; switching it off deletes it there. Nothing else leaves your shop. No telemetry, no analytics, no remote scripts or fonts. Details, retention and the personal-data exporter/eraser are in `docs/PRIVACY.md`.
+
+## Where to find things
+
+| | |
 |---|---|
-| All mapped to ResellingKori | One **Send to ResellingKori** button |
-| Some mapped, some not | Option to send only ResellingKori items — tick what to send |
-| None mapped | Blocked until at least one product is mapped |
+| Dashboard, setup, products, orders, logs & diagnostics, settings | WooCommerce → ResellingKori (tabs) |
+| Each order | the **ResellingKori** box on the order screen |
+| Logs & diagnostics (secrets are never written; e-mail addresses and phone numbers are masked as a second line of defence) | WooCommerce → ResellingKori → Logs & diagnostics |
+| Agent dashboard (optional) | WooCommerce → ResellingKori → Settings → ResellingKori agent dashboard |
+| Documentation | `docs/` inside the plugin: `INSTALLATION.md`, `RESELLER_SETUP.md`, `AGENT_GUIDE.md`, `TROUBLESHOOTING.md`, `SECURITY.md`, `PRIVACY.md`, `CHANGELOG.md` |
 
----
+## Permissions
 
-## Status Sync
+Administrators can do everything. Shop managers can link products, send and cancel orders and see ResellingKori information on orders; they cannot see the logs, the settings or the credentials. Access is controlled by six capabilities (`rkc_manage_connection`, `rkc_manage_credentials`, `rkc_manage_mapping`, `rkc_submit_orders`, `rkc_view_orders`, `rkc_view_logs`), so a role can be given exactly what it needs. Having WooCommerce's `manage_woocommerce` is **not** enough on its own. Switching the agent dashboard on or off needs `rkc_manage_connection`.
 
-- **Push (webhook):** ResellingKori sends signed events to `/wp-json/rkc/v1/webhook`
-- **Pull (fallback):** 15-minute cron polls open orders
-- **Manual:** "Refresh status" button on the order page
+## Uninstalling
 
-Statuses: `pending → processing → shipped → delivered → returned → cancelled`  
-Map each to a WooCommerce status in Settings (default: only `delivered → completed`).
-
-Tracking number, courier, and tracking URL appear in the order box and as an order note.
-
----
-
-## Developer Hooks
-
-```php
-// Modify the order payload before sending
-apply_filters( 'rkc_order_payload', $payload, $order, $lines );
-
-// Add custom send rules (return WP_Error to block)
-apply_filters( 'rkc_can_send_order', true, $order, $lines );
-
-// Fired after order is submitted
-do_action( 'rkc_order_submitted', $order, $rk_order, $payload );
-
-// Fired when remote status is applied
-do_action( 'rkc_remote_status_applied', $order, $new, $old, $tracking, $source );
-
-// Fired when a product is mapped
-do_action( 'rkc_product_mapped', $woo_id, $rk_item, $rk_variation_id, $source );
-```
-
----
-
-## Security
-
-- Requests signed with HMAC-SHA256 (`X-RK-Key`, `X-RK-Timestamp`, `X-RK-Signature`)
-- Secret is never transmitted
-- Timestamps older than 5 minutes are rejected
-- All admin actions require `manage_woocommerce` capability and a nonce
-- Remote data rendered with `textContent` only (no XSS)
-
----
-
-## Troubleshooting
-
-| Error | Fix |
-|---|---|
-| `HTTP 403/404` on resellingkori.com | A WAF/security plugin is blocking `/wp-json/rk/v1/` — allow it |
-| "Request timestamp outside allowed window" | Fix your server clock (NTP) |
-| "No sales agent linked to this API key" | Ask ResellingKori to link your agent account |
-| "Selling price below ResellingKori price" | Raise the price on your store |
-| Statuses not updating | Webhook URL must be publicly reachable; enable **Debug logging** in Settings |
-
----
-
-## Not using WooCommerce?
-
-Use one of the code SDKs to build a custom integration:
-
-| Language | Repository |
-|---|---|
-| PHP | [resellingkori-php](https://github.com/Resellingkori/resellingkori-php) |
-| Node.js | [resellingkori-nodejs](https://github.com/Resellingkori/resellingkori-nodejs) |
-| Python | [resellingkori-python](https://github.com/Resellingkori/resellingkori-python) |
-
----
-
-## Documentation
-
-- [Partner Docs](https://github.com/Resellingkori/partner-docs)
-- [Getting Started](https://github.com/Resellingkori/partner-docs/blob/main/GETTING_STARTED.md)
-- [API Guide](https://github.com/Resellingkori/partner-docs/blob/main/PARTNER_API_GUIDE.md)
-
----
-
-## License
-
-GPL-2.0-or-later
+Deactivating keeps everything. Deleting the plugin keeps your product links and order history unless you tick **Delete all data when the plugin is deleted** in Settings. Your key and secret are always erased on delete. If you used the agent dashboard, switch it off first so that ResellingKori deletes what it holds (deleting the plugin does not contact ResellingKori).

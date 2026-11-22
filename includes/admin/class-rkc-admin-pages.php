@@ -263,7 +263,7 @@ class RKC_Admin_Pages {
 				$out[] = array(
 					'kind' => 'warn',
 					'html' => '<strong>' . esc_html__( 'New: use your ResellingKori agent dashboard for this shop.', 'resellingkori-connector' ) . '</strong> '
-						. esc_html__( 'See the shop\'s orders that contain ResellingKori products, send them, and link products from your agent dashboard, without opening WooCommerce. This shares a short summary of those orders (order number, items, amounts, the customer\'s name and city and a partly hidden phone number) with your ResellingKori agent account.', 'resellingkori-connector' )
+						. esc_html__( 'See the shop\'s orders that contain ResellingKori products, send them, and link products from your agent dashboard, without opening WooCommerce. This shares a short summary of those orders (order number, items, amounts, the customer\'s name, phone number and delivery address) with your ResellingKori agent account.', 'resellingkori-connector' )
 						. ' <a class="rkc-btn rkc-btn--small rkc-btn--primary" href="' . esc_url( self::action_url( 'workspace_enable' ) ) . '">' . esc_html__( 'Turn on', 'resellingkori-connector' ) . '</a> '
 						. '<a class="rkc-btn rkc-btn--small" href="' . esc_url( self::action_url( 'workspace_decline' ) ) . '">' . esc_html__( 'Not now', 'resellingkori-connector' ) . '</a>',
 				);
@@ -572,7 +572,7 @@ class RKC_Admin_Pages {
 
 	/** What leaves the shop when the dashboard sync is on - said in plain words wherever the choice is offered. */
 	private static function ws_disclosure() {
-		return __( 'Your ResellingKori agent dashboard can then list the orders of this shop that contain ResellingKori products, and let you send them, cancel them and link products from there. For that, this shop sends ResellingKori a short summary of those orders: order number, status, items and amounts, the customer\'s name and city and a partly hidden phone number. The e-mail address, the street address and the complete phone number are never included; they leave the shop only when an order is sent, as before. You can switch this off at any time and everything is deleted at ResellingKori.', 'resellingkori-connector' );
+		return __( 'Your ResellingKori agent dashboard can then list the orders of this shop that contain ResellingKori products, and let you send them, cancel them and link products from there. For that, this shop sends ResellingKori a short summary of those orders: order number, status, items and amounts, the customer\'s name, phone number and delivery address. The e-mail address is never included. You can switch this off at any time and everything is deleted at ResellingKori.', 'resellingkori-connector' );
 	}
 
 	private static function ws_kind( array $ws ) {

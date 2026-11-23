@@ -1,16 +1,16 @@
 <?php
 /**
- * WooCommerce order integration: the "Send to ResellingKori" button.
+ * Everything the connector knows about a store order in relation to ResellingKori: its state, which lines are
+ * ResellingKori products, and the DRAFT of what would be sent (customer, lines, selling prices, payment split).
  *
- * Works with both legacy order storage and HPOS.
+ * Money is handled in integer minor units (paisa). The payload is always rebuilt on the server from the live
+ * order; the browser only supplies the choices (which lines, delivery charge, include other charges).
  *
- * Send modes (decided from how many order lines are mapped to ResellingKori):
- *   full     every line is mapped            -> one button sends the whole order
- *   partial  some lines are mapped, some not -> the admin picks which ResellingKori items to send
- *   none     no line is mapped               -> blocked until products are mapped
- *
- * The price each customer paid for a line travels with the order (unit_price), so
- * ResellingKori records it as the SalesKing "set price".
+ * Payment model (see API_DOCUMENTATION.md):
+ *   selling_total   = sum(selling_unit_price x quantity) of the lines sent
+ *   order_total     = selling_total + delivery_charge
+ *   cod_amount      = order_total - prepaid_amount          (what the ResellingKori courier collects)
+ *   Nothing is guessed: delivery_charge is an explicit number the staff member confirms.
  *
  * @package ResellingKori_Connector
  */
@@ -19,259 +19,9 @@ defined( 'ABSPATH' ) || exit;
 
 class RKC_Orders {
 
-	public static function init() {
-		add_action( 'add_meta_boxes', array( __CLASS__, 'add_meta_box' ) );
+	const FINAL_STATUSES = array( 'delivered', 'returned', 'cancelled' );
 
-		// Orders list column: HPOS screen first, then the legacy post-type screen.
-		add_filter( 'manage_woocommerce_page_wc-orders_columns', array( __CLASS__, 'add_column' ) );
-		add_action( 'manage_woocommerce_page_wc-orders_custom_column', array( __CLASS__, 'render_column' ), 10, 2 );
-		add_filter( 'manage_edit-shop_order_columns', array( __CLASS__, 'add_column' ) );
-		add_action( 'manage_shop_order_posts_custom_column', array( __CLASS__, 'render_column' ), 10, 2 );
-
-		add_action( 'wp_ajax_rkc_send_order', array( __CLASS__, 'ajax_send' ) );
-		add_action( 'wp_ajax_rkc_refresh_order', array( __CLASS__, 'ajax_refresh' ) );
-	}
-
-	/* ------------------------------------------------------------------ UI */
-
-	public static function add_meta_box() {
-		$screen = 'shop_order';
-		if ( class_exists( '\Automattic\WooCommerce\Utilities\OrderUtil' ) && \Automattic\WooCommerce\Utilities\OrderUtil::custom_orders_table_usage_is_enabled() ) {
-			$screen = wc_get_page_screen_id( 'shop-order' );
-		}
-		add_meta_box( 'rkc-order-box', __( 'ResellingKori', 'resellingkori-connector' ), array( __CLASS__, 'meta_box' ), $screen, 'side', 'high' );
-	}
-
-	/**
-	 * @param WP_Post|WC_Order $post_or_order Legacy storage passes a post, HPOS passes an order.
-	 */
-	public static function meta_box( $post_or_order ) {
-		$order = ( $post_or_order instanceof WP_Post ) ? wc_get_order( $post_or_order->ID ) : $post_or_order;
-		if ( ! $order instanceof WC_Order ) {
-			return;
-		}
-		echo '<div class="rkc-box" data-order-id="' . esc_attr( $order->get_id() ) . '">';
-		echo self::render_box( $order, false ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped inside render_box().
-		echo '</div>';
-	}
-
-	public static function add_column( $columns ) {
-		$out = array();
-		foreach ( $columns as $key => $label ) {
-			$out[ $key ] = $label;
-			if ( 'order_status' === $key ) {
-				$out['rkc_status'] = __( 'ResellingKori', 'resellingkori-connector' );
-			}
-		}
-		if ( ! isset( $out['rkc_status'] ) ) {
-			$out['rkc_status'] = __( 'ResellingKori', 'resellingkori-connector' );
-		}
-		return $out;
-	}
-
-	/**
-	 * @param string       $column      Column key.
-	 * @param WC_Order|int $order_or_id HPOS passes the order, legacy passes the post ID.
-	 */
-	public static function render_column( $column, $order_or_id ) {
-		if ( 'rkc_status' !== $column ) {
-			return;
-		}
-		$order = ( $order_or_id instanceof WC_Order ) ? $order_or_id : wc_get_order( $order_or_id );
-		if ( ! $order instanceof WC_Order ) {
-			return;
-		}
-		echo '<div class="rkc-box" data-compact="1" data-order-id="' . esc_attr( $order->get_id() ) . '">';
-		echo self::render_box( $order, true ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped inside render_box().
-		echo '</div>';
-	}
-
-	public static function status_label( $status ) {
-		$all = RKC_Settings::rk_statuses();
-		return isset( $all[ $status ] ) ? $all[ $status ] : ucfirst( (string) $status );
-	}
-
-	/**
-	 * Inner HTML of the ResellingKori box. Everything is escaped here.
-	 *
-	 * @param WC_Order $order   Order.
-	 * @param bool     $compact Compact layout for the orders list.
-	 * @return string
-	 */
-	public static function render_box( WC_Order $order, $compact = false ) {
-		$state = self::state( $order );
-		$id    = (int) $order->get_id();
-
-		ob_start();
-
-		// Already submitted.
-		if ( $state['submitted'] ) {
-			echo '<div class="rkc-line"><span class="rkc-badge rkc-s-' . esc_attr( $state['status'] ) . '">' . esc_html( self::status_label( $state['status'] ) ) . '</span> ';
-			echo '<strong class="rkc-num">' . esc_html( $state['number'] ) . '</strong>';
-			if ( $state['partial'] ) {
-				echo ' <span class="rkc-badge rkc-warn">' . esc_html__( 'Partial', 'resellingkori-connector' ) . '</span>';
-			}
-			echo '</div>';
-
-			if ( ! $compact ) {
-				$t = $state['tracking'];
-				if ( ! empty( $t['number'] ) || ! empty( $t['courier'] ) ) {
-					echo '<div class="rkc-track">';
-					if ( ! empty( $t['courier'] ) ) {
-						echo '<span>' . esc_html( $t['courier'] ) . '</span> ';
-					}
-					if ( ! empty( $t['number'] ) ) {
-						if ( ! empty( $t['url'] ) ) {
-							echo '<a href="' . esc_url( $t['url'] ) . '" target="_blank" rel="noopener noreferrer">' . esc_html( $t['number'] ) . '</a>';
-						} else {
-							echo '<code>' . esc_html( $t['number'] ) . '</code>';
-						}
-					}
-					echo '</div>';
-				}
-				if ( $state['partial'] ) {
-					self::render_partial_summary( $order, $state );
-				}
-				if ( $state['synced_at'] ) {
-					/* translators: %s: human readable time difference */
-					echo '<div class="rkc-muted">' . esc_html( sprintf( __( 'Last synced %s ago', 'resellingkori-connector' ), human_time_diff( $state['synced_at'] ) ) ) . '</div>';
-				}
-				echo '<p><button type="button" class="button rkc-refresh" data-order-id="' . esc_attr( $id ) . '">' . esc_html__( 'Refresh status', 'resellingkori-connector' ) . '</button></p>';
-			}
-			return ob_get_clean();
-		}
-
-		// Not submitted yet.
-		$lines = self::resolve_items( $order );
-		$mode  = self::send_mode( $lines );
-		$can   = self::can_send( $order, $lines );
-
-		if ( $compact ) {
-			if ( true === $can ) {
-				if ( 'partial' === $mode ) {
-					// Choosing items needs the order screen.
-					echo '<a class="button button-small" href="' . esc_url( $order->get_edit_order_url() ) . '">' . esc_html__( 'Choose items', 'resellingkori-connector' ) . '</a>';
-				} else {
-					echo '<button type="button" class="button button-small rkc-send" data-order-id="' . esc_attr( $id ) . '">' . esc_html__( 'Send to RK', 'resellingkori-connector' ) . '</button>';
-				}
-			} else {
-				$short = array(
-					'rkc_unmapped'       => __( 'Not mapped', 'resellingkori-connector' ),
-					'rkc_customer'       => __( 'Missing info', 'resellingkori-connector' ),
-					'rkc_not_configured' => __( 'Not connected', 'resellingkori-connector' ),
-				);
-				$code  = $can->get_error_code();
-				if ( isset( $short[ $code ] ) ) {
-					echo '<span class="rkc-badge rkc-warn" title="' . esc_attr( $can->get_error_message() ) . '">' . esc_html( $short[ $code ] ) . '</span>';
-				} else {
-					echo '<span class="rkc-muted" title="' . esc_attr( $can->get_error_message() ) . '">&ndash;</span>';
-				}
-			}
-			if ( $state['error'] ) {
-				echo '<div class="rkc-msg rkc-error">' . esc_html( $state['error']['message'] ) . '</div>';
-			}
-			return ob_get_clean();
-		}
-
-		if ( $state['error'] ) {
-			echo '<div class="rkc-msg rkc-error">' . esc_html( $state['error']['message'] ) . '</div>';
-		}
-
-		// Mixed order: some items are from ResellingKori, some are not.
-		if ( 'partial' === $mode && true === $can ) {
-			self::render_partial_form( $order, $lines );
-			return ob_get_clean();
-		}
-
-		if ( $lines ) {
-			echo '<ul class="rkc-lines">';
-			foreach ( $lines as $l ) {
-				echo '<li><span class="rkc-line-name">' . esc_html( $l['name'] ) . ' &times; ' . (int) $l['qty'] . '</span>';
-				if ( ! empty( $l['map'] ) ) {
-					echo '<span class="rkc-ok">&check; ' . esc_html( self::map_label( $l['map'] ) ) . '</span>';
-				} elseif ( $l['woo_id'] ) {
-					echo '<a class="rkc-bad" href="' . esc_url( RKC_Admin::map_url( $l['woo_id'] ) ) . '">' . esc_html__( 'Not mapped — map now', 'resellingkori-connector' ) . '</a>';
-				} else {
-					echo '<span class="rkc-bad">' . esc_html__( 'Product no longer exists', 'resellingkori-connector' ) . '</span>';
-				}
-				echo '</li>';
-			}
-			echo '</ul>';
-		}
-
-		if ( true === $can ) {
-			echo '<p><button type="button" class="button button-primary rkc-send" data-order-id="' . esc_attr( $id ) . '">' . esc_html__( 'Send to ResellingKori', 'resellingkori-connector' ) . '</button></p>';
-		} else {
-			echo '<p class="rkc-muted">' . esc_html( $can->get_error_message() ) . '</p>';
-			echo '<p><button type="button" class="button" disabled>' . esc_html__( 'Send to ResellingKori', 'resellingkori-connector' ) . '</button></p>';
-		}
-
-		return ob_get_clean();
-	}
-
-	private static function map_label( array $map ) {
-		return '' !== $map['name'] ? $map['name'] : '#' . $map['rk_product_id'];
-	}
-
-	/**
-	 * The picker shown ONLY for mixed orders: ResellingKori items are checkboxes (pre-checked),
-	 * items that are not from ResellingKori are listed as "will not be sent".
-	 *
-	 * @param WC_Order $order Order.
-	 * @param array    $lines Output of resolve_items().
-	 */
-	private static function render_partial_form( WC_Order $order, array $lines ) {
-		$is_cod = self::is_cod( $order );
-		$symbol = html_entity_decode( get_woocommerce_currency_symbol(), ENT_QUOTES, 'UTF-8' );
-		$sum    = 0.0;
-
-		echo '<p class="rkc-muted">' . esc_html__( 'Some items in this order are not from ResellingKori. Choose the ResellingKori items to send. Unchecked items cannot be sent later (one ResellingKori order per store order).', 'resellingkori-connector' ) . '</p>';
-		echo '<div class="rkc-partial" data-cod="' . ( $is_cod ? '1' : '0' ) . '" data-symbol="' . esc_attr( $symbol ) . '">';
-		echo '<ul class="rkc-lines">';
-		foreach ( $lines as $l ) {
-			echo '<li>';
-			if ( ! empty( $l['map'] ) ) {
-				$sum += (float) $l['total'];
-				echo '<label><input type="checkbox" class="rkc-pick" value="' . esc_attr( (int) $l['item_id'] ) . '" data-total="' . esc_attr( round( (float) $l['total'], 2 ) ) . '" checked="checked" /> ' . esc_html( $l['name'] ) . ' &times; ' . (int) $l['qty'] . '</label>';
-				echo '<span class="rkc-ok">&check; ' . esc_html( self::map_label( $l['map'] ) ) . '</span>';
-			} else {
-				echo '<span class="rkc-line-name">' . esc_html( $l['name'] ) . ' &times; ' . (int) $l['qty'] . '</span>';
-				echo '<span class="rkc-muted">' . esc_html__( 'Not from ResellingKori: will not be sent', 'resellingkori-connector' ) . '</span>';
-				if ( $l['woo_id'] ) {
-					echo '<a class="rkc-bad" href="' . esc_url( RKC_Admin::map_url( $l['woo_id'] ) ) . '">' . esc_html__( 'Map it', 'resellingkori-connector' ) . '</a>';
-				}
-			}
-			echo '</li>';
-		}
-		echo '</ul>';
-
-		if ( $is_cod ) {
-			echo '<p><label>' . esc_html__( 'Extra amount to collect on this parcel (delivery charge etc.)', 'resellingkori-connector' ) . ' ' . esc_html( $symbol ) . ' <input type="number" class="rkc-extra small-text" min="0" step="0.01" value="0" /></label></p>';
-			echo '<p class="rkc-cod">' . esc_html__( 'ResellingKori will collect:', 'resellingkori-connector' ) . ' <strong class="rkc-cod-amount">' . esc_html( $symbol . ' ' . number_format( $sum, 2 ) ) . '</strong></p>';
-		}
-		echo '<p><button type="button" class="button button-primary rkc-send" data-order-id="' . esc_attr( (int) $order->get_id() ) . '">' . esc_html__( 'Send selected items to ResellingKori', 'resellingkori-connector' ) . '</button></p>';
-		echo '<p class="rkc-muted">' . esc_html__( 'The order status will not be changed automatically for a partial shipment.', 'resellingkori-connector' ) . '</p>';
-		echo '</div>';
-	}
-
-	/** After a partial send: which items went to ResellingKori and which did not. */
-	private static function render_partial_summary( WC_Order $order, array $state ) {
-		echo '<ul class="rkc-lines">';
-		foreach ( self::resolve_items( $order ) as $l ) {
-			$sent = in_array( (int) $l['item_id'], $state['sent_items'], true );
-			echo '<li><span class="rkc-line-name">' . esc_html( $l['name'] ) . ' &times; ' . (int) $l['qty'] . '</span>';
-			if ( $sent ) {
-				echo '<span class="rkc-ok">&check; ' . esc_html__( 'Sent to ResellingKori', 'resellingkori-connector' ) . '</span>';
-			} else {
-				echo '<span class="rkc-muted">' . esc_html__( 'Not sent (not from ResellingKori)', 'resellingkori-connector' ) . '</span>';
-			}
-			echo '</li>';
-		}
-		echo '</ul>';
-		echo '<p class="rkc-muted">' . esc_html__( 'Partial shipment: the order status is not changed automatically.', 'resellingkori-connector' ) . '</p>';
-	}
-
-	/* --------------------------------------------------------------- State */
+	/* ------------------------------------------------------------- State */
 
 	/**
 	 * @param WC_Order $order Order.
@@ -283,97 +33,144 @@ class RKC_Orders {
 		$tracking = $order->get_meta( '_rkc_tracking' );
 		$sent     = $order->get_meta( '_rkc_sent_items' );
 		$status   = (string) $order->get_meta( '_rkc_rk_status' );
+		$sub      = RKC_Submit::latest( $order->get_id() );
+
+		if ( $sub ) {
+			$stage = $sub->state;
+		} else {
+			$stage = $rk_id > 0 ? 'accepted' : 'none'; // Submitted by v0.2.0: no submission row, but linked.
+		}
 
 		return array(
-			'submitted'   => $rk_id > 0,
+			'stage'       => $stage, // none | claimed | sending | unknown | rejected | accepted | cancelled
+			'submitted'   => 'accepted' === $stage && $rk_id > 0,
 			'rk_order_id' => $rk_id,
 			'number'      => (string) $order->get_meta( '_rkc_rk_order_number' ),
-			'status'      => '' !== $status ? $status : 'pending',
+			'status'      => '' !== $status ? $status : ( 'accepted' === $stage ? 'pending' : '' ),
 			'tracking'    => is_array( $tracking ) ? $tracking : array(),
 			'synced_at'   => (int) $order->get_meta( '_rkc_synced_at' ),
 			'partial'     => (bool) $order->get_meta( '_rkc_partial' ),
 			'sent_items'  => is_array( $sent ) ? array_map( 'intval', $sent ) : array(),
 			'error'       => ( is_array( $error ) && ! empty( $error['message'] ) ) ? $error : null,
+			'submission'  => $sub,
+			'legacy'      => ( ! $sub && $rk_id > 0 ),
+			'changed'     => $sub && in_array( $sub->state, array( 'accepted', 'unknown' ), true ) ? self::changed_since( $order, $sub ) : false,
 		);
 	}
 
+	/** True when the order's items no longer match what was submitted (so staff know an amendment is needed). */
+	private static function changed_since( WC_Order $order, $sub ) {
+		$payload = json_decode( (string) $sub->payload, true );
+		if ( ! is_array( $payload ) || empty( $payload['items'] ) ) {
+			return false;
+		}
+		$sent = array();
+		foreach ( $payload['items'] as $it ) {
+			$sent[ (int) $it['external_item_id'] ] = (int) $it['quantity'];
+		}
+		foreach ( self::lines( $order ) as $l ) {
+			if ( isset( $sent[ $l['item_id'] ] ) && $sent[ $l['item_id'] ] !== $l['qty'] ) {
+				return true;
+			}
+			if ( ! isset( $sent[ $l['item_id'] ] ) && ! empty( $l['map'] ) && ! $order->get_meta( '_rkc_partial' ) ) {
+				return true;
+			}
+		}
+		foreach ( array_keys( $sent ) as $id ) {
+			if ( ! $order->get_item( $id ) ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static function status_label( $status ) {
+		$labels = RKC_Settings::rk_statuses();
+		return isset( $labels[ $status ] ) ? $labels[ $status ] : ucfirst( str_replace( '_', ' ', (string) $status ) );
+	}
+
+	/* -------------------------------------------------------------- Lines */
+
 	/**
-	 * One entry per product line with its ResellingKori mapping.
+	 * One entry per product line with its ResellingKori mapping and what the customer paid for it.
 	 *
 	 * @param WC_Order $order Order.
 	 * @return array[]
 	 */
-	public static function resolve_items( WC_Order $order ) {
+	public static function lines( WC_Order $order ) {
 		$lines = array();
 		foreach ( $order->get_items() as $item_id => $item ) {
 			if ( ! $item instanceof WC_Order_Item_Product ) {
 				continue;
 			}
-			$woo_id  = $item->get_variation_id() ? (int) $item->get_variation_id() : (int) $item->get_product_id();
-			$product = $item->get_product();
-			$lines[] = array(
-				'item_id' => (int) $item_id,
-				'woo_id'  => $product ? $woo_id : 0,
-				'name'    => $item->get_name(),
-				'qty'     => (int) $item->get_quantity(),
-				'sku'     => $product ? (string) $product->get_sku() : '',
-				'total'   => (float) $item->get_total(),
-				'map'     => ( $product && $woo_id ) ? RKC_Mapping::get( $woo_id ) : null,
+			$woo_id   = $item->get_variation_id() ? (int) $item->get_variation_id() : (int) $item->get_product_id();
+			$product  = $item->get_product();
+			$qty      = (int) $item->get_quantity() + (int) $order->get_qty_refunded_for_item( $item_id ); // Refunded quantity is negative.
+			$paid     = RKC_Money::from_wc( $item->get_total() ) + RKC_Money::from_wc( $item->get_total_tax() ) - RKC_Money::from_wc( $order->get_total_refunded_for_item( $item_id ) );
+			$unit     = $qty > 0 ? intdiv( max( 0, $paid ), $qty ) : 0; // Rounded DOWN: unit x qty never exceeds what the customer paid.
+			$map      = ( $product && $woo_id ) ? RKC_Mapping::get( $woo_id ) : null;
+			$lines[]  = array(
+				'item_id'     => (int) $item_id,
+				'woo_id'      => $product ? $woo_id : 0,
+				'name'        => $item->get_name(),
+				'qty'         => max( 0, $qty ),
+				'sku'         => $product ? (string) $product->get_sku() : '',
+				'paid_minor'  => max( 0, $paid ),
+				'unit_minor'  => $unit,
+				'sell_minor'  => $unit * max( 0, $qty ),
+				// A mapping nobody has confirmed yet is not used: the line is treated as "not a ResellingKori product".
+				'map'         => ( $map && empty( $map['review'] ) ) ? $map : null,
+				'needs_review' => (bool) ( $map && ! empty( $map['review'] ) ),
+				'image'       => ( $product && $product->get_image_id() ) ? (string) wp_get_attachment_image_url( $product->get_image_id(), 'thumbnail' ) : '',
 			);
 		}
 		return $lines;
 	}
 
-	/**
-	 * @param array[] $lines Output of resolve_items().
-	 * @return string full | partial | none
-	 */
+	/** @return string full | partial | none */
 	public static function send_mode( array $lines ) {
-		$mapped   = 0;
-		$unmapped = 0;
+		$mapped = 0;
+		$other  = 0;
 		foreach ( $lines as $l ) {
+			if ( $l['qty'] < 1 ) {
+				continue;
+			}
 			if ( ! empty( $l['map'] ) ) {
 				++$mapped;
 			} else {
-				++$unmapped;
+				++$other;
 			}
 		}
 		if ( ! $mapped ) {
 			return 'none';
 		}
-		return $unmapped ? 'partial' : 'full';
+		return $other ? 'partial' : 'full';
 	}
 
-	private static function is_cod( WC_Order $order ) {
+	public static function is_cod( WC_Order $order ) {
 		$ids = array_filter( array_map( 'trim', explode( ',', (string) RKC_Settings::get( 'cod_gateways' ) ) ) );
 		return in_array( $order->get_payment_method(), $ids, true );
 	}
 
-	/**
-	 * Customer details, preferring the shipping address and falling back to billing.
-	 *
-	 * @param WC_Order $order Order.
-	 * @return array
-	 */
+	/* ----------------------------------------------------------- Customer */
+
 	public static function customer( WC_Order $order ) {
 		$ship = $order->has_shipping_address();
 		$pick = function ( $field ) use ( $order, $ship ) {
 			$val = '';
 			if ( $ship ) {
-				$method = 'get_shipping_' . $field;
-				$val    = method_exists( $order, $method ) ? trim( (string) $order->$method() ) : '';
+				$m   = 'get_shipping_' . $field;
+				$val = method_exists( $order, $m ) ? trim( (string) $order->$m() ) : '';
 			}
 			if ( '' === $val ) {
-				$method = 'get_billing_' . $field;
-				$val    = method_exists( $order, $method ) ? trim( (string) $order->$method() ) : '';
+				$m   = 'get_billing_' . $field;
+				$val = method_exists( $order, $m ) ? trim( (string) $order->$m() ) : '';
 			}
 			return $val;
 		};
-
 		$ship_name = trim( $order->get_shipping_first_name() . ' ' . $order->get_shipping_last_name() );
 		$bill_name = trim( $order->get_billing_first_name() . ' ' . $order->get_billing_last_name() );
 		$country   = $pick( 'country' );
-
 		return array(
 			'name'      => ( $ship && '' !== $ship_name ) ? $ship_name : $bill_name,
 			'phone'     => $pick( 'phone' ),
@@ -401,45 +198,43 @@ class RKC_Orders {
 		return $missing;
 	}
 
+	/* ---------------------------------------------------- Pre-flight check */
+
 	/**
-	 * Every pre-flight check in one place. Returns true or a WP_Error whose message is shown to the admin.
-	 * A mixed order is allowed (the admin then chooses the items); an order with no mapped item is not.
+	 * Checks that do not depend on the staff member's choices. A mixed order is allowed (staff then choose the
+	 * items); an order with no ResellingKori item is not.
 	 *
-	 * @param WC_Order   $order Order.
-	 * @param array|null $lines Output of resolve_items().
 	 * @return true|WP_Error
 	 */
 	public static function can_send( WC_Order $order, $lines = null ) {
-		if ( ! RKC_API_Client::configured() ) {
-			return new WP_Error( 'rkc_not_configured', __( 'ResellingKori is not connected. Add your API key in WooCommerce > ResellingKori > Settings.', 'resellingkori-connector' ) );
+		if ( ! RKC_Config::connected() ) {
+			return new WP_Error( 'rkc_not_configured', __( 'ResellingKori is not connected yet. Finish the setup in WooCommerce > ResellingKori.', 'resellingkori-connector' ) );
 		}
-		if ( $order->get_meta( '_rkc_rk_order_id' ) ) {
+		if ( false === RKC_Config::get( 'agent_valid' ) ) {
+			return new WP_Error( 'rkc_no_agent', __( 'No valid sales agent is linked to your ResellingKori key, so orders cannot be placed. Ask ResellingKori to link your agent account.', 'resellingkori-connector' ) );
+		}
+		if ( false === RKC_Config::get( 'agent_match' ) ) {
+			// The key belongs to a different sales agent than the one this shop expects: commission would go to the wrong person.
+			return new WP_Error( 'rkc_agent_mismatch', __( 'The sales agent linked to your ResellingKori key is not the agent you expect (see Settings). Orders are paused until this is resolved, so the commission does not go to the wrong agent.', 'resellingkori-connector' ) );
+		}
+		$st = self::state( $order );
+		if ( in_array( $st['stage'], array( 'accepted', 'sending', 'claimed' ), true ) ) {
 			return new WP_Error( 'rkc_already', __( 'This order has already been submitted to ResellingKori.', 'resellingkori-connector' ) );
 		}
-		if ( ! in_array( $order->get_status(), (array) RKC_Settings::get( 'send_statuses' ), true ) ) {
-			return new WP_Error(
-				'rkc_status',
-				sprintf(
-					/* translators: %s: order status name */
-					__( 'Orders with status "%s" cannot be sent. Change the allowed statuses in Settings if needed.', 'resellingkori-connector' ),
-					wc_get_order_status_name( $order->get_status() )
-				)
-			);
+		if ( 'unknown' === $st['stage'] ) {
+			return new WP_Error( 'rkc_unknown', __( 'The last attempt to send this order did not get a clear answer. Press "Check status" so nothing is sent twice.', 'resellingkori-connector' ) );
 		}
-
+		if ( ! in_array( $order->get_status(), (array) RKC_Settings::get( 'send_statuses' ), true ) ) {
+			return new WP_Error( 'rkc_status', sprintf( /* translators: %s: order status name */ __( 'Orders with status "%s" cannot be sent. Change the allowed statuses in Settings if needed.', 'resellingkori-connector' ), wc_get_order_status_name( $order->get_status() ) ) );
+		}
+		if ( 'BDT' !== $order->get_currency() ) {
+			return new WP_Error( 'rkc_currency', sprintf( /* translators: %s: currency code */ __( 'ResellingKori only accepts orders in BDT (this order is in %s).', 'resellingkori-connector' ), $order->get_currency() ) );
+		}
 		$missing = self::missing_customer_fields( self::customer( $order ) );
 		if ( $missing ) {
-			return new WP_Error(
-				'rkc_customer',
-				sprintf(
-					/* translators: %s: list of missing fields */
-					__( 'Customer information missing: %s.', 'resellingkori-connector' ),
-					implode( ', ', $missing )
-				)
-			);
+			return new WP_Error( 'rkc_customer', sprintf( /* translators: %s: list of missing fields */ __( 'Customer information missing: %s.', 'resellingkori-connector' ), implode( ', ', $missing ) ) );
 		}
-
-		$lines = ( null === $lines ) ? self::resolve_items( $order ) : $lines;
+		$lines = ( null === $lines ) ? self::lines( $order ) : $lines;
 		if ( ! $lines ) {
 			return new WP_Error( 'rkc_no_items', __( 'This order has no products to fulfil.', 'resellingkori-connector' ) );
 		}
@@ -448,17 +243,8 @@ class RKC_Orders {
 			foreach ( $lines as $l ) {
 				$names[] = $l['name'];
 			}
-			return new WP_Error(
-				'rkc_unmapped',
-				sprintf(
-					/* translators: %s: product names */
-					__( 'Not connected with ResellingKori: %s. Map at least one product first.', 'resellingkori-connector' ),
-					implode( ', ', $names )
-				),
-				array( 'products' => $names )
-			);
+			return new WP_Error( 'rkc_unmapped', sprintf( /* translators: %s: product names */ __( 'Not connected with ResellingKori: %s. Map at least one product first.', 'resellingkori-connector' ), implode( ', ', $names ) ), array( 'products' => $names ) );
 		}
-
 		$can = apply_filters( 'rkc_can_send_order', true, $order, $lines );
 		if ( true !== $can && ! is_wp_error( $can ) ) {
 			return new WP_Error( 'rkc_blocked', __( 'Sending this order is blocked.', 'resellingkori-connector' ) );
@@ -466,262 +252,335 @@ class RKC_Orders {
 		return $can;
 	}
 
-	/* ---------------------------------------------------------------- Send */
+	/* -------------------------------------------------------------- Draft */
 
 	/**
-	 * Submit an order (or, for a mixed order, the chosen ResellingKori items) to ResellingKori.
-	 *
-	 * Duplicate protection: the API de-duplicates on (API key + external order ID), so a
-	 * retry after a timeout returns the original order instead of creating another.
+	 * Build the proposal. Never throws; blocking problems are in ['errors'].
 	 *
 	 * @param WC_Order $order Order.
-	 * @param array    $opts  { item_ids: int[] (order item IDs, partial mode), extra: float (extra amount to collect, partial mode) }.
-	 * @return array|WP_Error ResellingKori order data.
-	 */
-	public static function send( WC_Order $order, array $opts = array() ) {
-		$lines = self::resolve_items( $order );
-		$can   = self::can_send( $order, $lines );
-		if ( is_wp_error( $can ) ) {
-			return $can;
-		}
-
-		$mode       = self::send_mode( $lines );
-		$partial    = ( 'partial' === $mode );
-		$send_lines = $lines;
-		$extra      = 0.0;
-
-		if ( $partial ) {
-			$chosen     = isset( $opts['item_ids'] ) ? array_map( 'intval', (array) $opts['item_ids'] ) : array();
-			$send_lines = array();
-			foreach ( $lines as $l ) {
-				if ( ! empty( $l['map'] ) && in_array( (int) $l['item_id'], $chosen, true ) ) {
-					$send_lines[] = $l;
-				}
-			}
-			if ( ! $send_lines ) {
-				return new WP_Error( 'rkc_select_items', __( 'Select at least one ResellingKori item to send.', 'resellingkori-connector' ) );
-			}
-			$extra = isset( $opts['extra'] ) ? max( 0.0, round( (float) $opts['extra'], 2 ) ) : 0.0;
-		}
-
-		$lock = (int) $order->get_meta( '_rkc_lock' );
-		if ( $lock && ( time() - $lock ) < 60 ) {
-			return new WP_Error( 'rkc_busy', __( 'This order is already being sent. Please wait a moment.', 'resellingkori-connector' ) );
-		}
-		$order->update_meta_data( '_rkc_lock', time() );
-		$order->save_meta_data();
-
-		$payload = self::build_payload( $order, $send_lines, $partial, $extra );
-		$res     = RKC_API_Client::create_order( $payload );
-
-		$order->delete_meta_data( '_rkc_lock' );
-
-		if ( is_wp_error( $res ) ) {
-			return self::record_failure( $order, $res );
-		}
-
-		$rk = ( isset( $res['order'] ) && is_array( $res['order'] ) ) ? $res['order'] : null;
-		if ( ! $rk || empty( $rk['id'] ) ) {
-			return self::record_failure(
-				$order,
-				new WP_Error( 'rkc_bad_response', __( 'ResellingKori returned no order ID. It is safe to try again: duplicate orders are prevented.', 'resellingkori-connector' ) )
-			);
-		}
-
-		$number = isset( $rk['number'] ) ? sanitize_text_field( (string) $rk['number'] ) : (string) $rk['id'];
-		$sent   = array();
-		foreach ( $send_lines as $l ) {
-			$sent[] = (int) $l['item_id'];
-		}
-
-		$order->update_meta_data( '_rkc_rk_order_id', (int) $rk['id'] );
-		$order->update_meta_data( '_rkc_rk_order_number', $number );
-		$order->update_meta_data( '_rkc_rk_status', isset( $rk['status'] ) ? sanitize_key( $rk['status'] ) : 'pending' );
-		$order->update_meta_data( '_rkc_submitted_at', time() );
-		$order->update_meta_data( '_rkc_synced_at', time() );
-		$order->update_meta_data( '_rkc_open', 1 );
-		$order->update_meta_data( '_rkc_partial', $partial ? 1 : 0 );
-		$order->update_meta_data( '_rkc_sent_items', $sent );
-		$order->delete_meta_data( '_rkc_last_error' );
-		$order->save();
-
-		if ( ! empty( $res['duplicate'] ) ) {
-			/* translators: %s: ResellingKori order number */
-			$order->add_order_note( sprintf( __( 'This order already existed on ResellingKori (%s). Linked it instead of creating a duplicate.', 'resellingkori-connector' ), $number ) );
-		} elseif ( $partial ) {
-			$order->add_order_note(
-				sprintf(
-					/* translators: 1: items sent, 2: items in the order, 3: ResellingKori order number */
-					__( 'Submitted %1$d of %2$d items to ResellingKori as order %3$s (partial shipment; the other items are fulfilled by this store).', 'resellingkori-connector' ),
-					count( $send_lines ),
-					count( $lines ),
-					$number
-				)
-			);
-		} else {
-			/* translators: %s: ResellingKori order number */
-			$order->add_order_note( sprintf( __( 'Submitted to ResellingKori as order %s.', 'resellingkori-connector' ), $number ) );
-		}
-
-		// A partial shipment never changes the store order's status on its own.
-		$after = (string) RKC_Settings::get( 'after_send' );
-		if ( ! $partial && '' !== $after && $after !== $order->get_status() ) {
-			$known = RKC_Settings::statuses();
-			if ( isset( $known[ $after ] ) ) {
-				$order->update_status( $after, __( 'Order sent to ResellingKori.', 'resellingkori-connector' ) );
-			}
-		}
-
-		do_action( 'rkc_order_submitted', $order, $rk, $payload );
-
-		return $rk;
-	}
-
-	private static function record_failure( WC_Order $order, WP_Error $error ) {
-		$order->update_meta_data(
-			'_rkc_last_error',
-			array(
-				'code'    => $error->get_error_code(),
-				'message' => $error->get_error_message(),
-				'time'    => time(),
-			)
-		);
-		$order->save();
-		/* translators: %s: error message */
-		$order->add_order_note( sprintf( __( 'ResellingKori submission failed: %s', 'resellingkori-connector' ), $error->get_error_message() ) );
-		return $error;
-	}
-
-	/**
-	 * @param WC_Order $order   Order.
-	 * @param array    $lines   The lines being sent (all mapped).
-	 * @param bool     $partial True when only some of the order's items are sent.
-	 * @param float    $extra   Extra amount to collect on a partial parcel (delivery etc.).
+	 * @param array    $opts  { item_ids: int[], delivery: string|null (BDT), include_other: bool|null }
+	 * @param array    $rk    Live ResellingKori data per "productId:variationId": { base_minor, purchasable, name } (from review).
 	 * @return array
 	 */
-	private static function build_payload( WC_Order $order, array $lines, $partial, $extra ) {
-		$is_cod = self::is_cod( $order );
-		$total  = (float) $order->get_total();
+	public static function draft( WC_Order $order, array $opts = array(), array $rk = array() ) {
+		$lines    = self::lines( $order );
+		$mode     = self::send_mode( $lines );
+		$partial  = ( 'partial' === $mode );
+		$errors   = array();
+		$warnings = array();
+		$limits   = (array) get_option( 'rkc_limits', array() );
 
-		$items       = array();
-		$items_total = 0.0;
-		foreach ( $lines as $l ) {
-			$qty = max( 1, (int) $l['qty'] );
-			// Round DOWN to the cent so unit price x quantity never exceeds what the customer paid for the line.
-			$unit         = floor( ( $l['total'] / $qty ) * 100 + 0.000001 ) / 100;
-			$items_total += round( $unit * $qty, 2 );
-			$items[]      = array(
-				'external_item_id' => (int) $l['item_id'],
-				'rk_product_id'    => (int) $l['map']['rk_product_id'],
-				'rk_variation_id'  => (int) $l['map']['rk_variation_id'],
-				'quantity'         => $qty,
-				'external_name'    => $l['name'],
-				'external_sku'     => $l['sku'],
-				// The price this store's customer pays: ResellingKori records it as the SalesKing set price.
-				'unit_price'       => $unit,
-			);
+		$pre = self::can_send( $order, $lines );
+		if ( is_wp_error( $pre ) ) {
+			$errors[] = $pre->get_error_message();
 		}
 
-		// Amount the ResellingKori courier collects. Whole order: the order total. Partial parcel: the items' price plus any extra.
-		$cod = 0.0;
-		if ( $is_cod ) {
-			$cod = $partial ? ( $items_total + (float) $extra ) : $total;
+		// Which lines go.
+		$chosen = isset( $opts['item_ids'] ) ? array_map( 'intval', (array) $opts['item_ids'] ) : null;
+		$send   = array();
+		foreach ( $lines as &$l ) {
+			$l['mapped']   = ! empty( $l['map'] ) && $l['qty'] > 0;
+			$l['selected'] = $l['mapped'] && ( ! $partial || null === $chosen || in_array( $l['item_id'], $chosen, true ) );
+			$key           = $l['mapped'] ? $l['map']['rk_product_id'] . ':' . $l['map']['rk_variation_id'] : '';
+			$l['rk']       = ( '' !== $key && isset( $rk[ $key ] ) ) ? $rk[ $key ] : null;
+			if ( $l['selected'] ) {
+				$send[] = $l;
+			}
+		}
+		unset( $l );
+		if ( ! $send ) {
+			$errors[] = $partial ? __( 'Select at least one ResellingKori item to send.', 'resellingkori-connector' ) : __( 'There is nothing to send.', 'resellingkori-connector' );
+		}
+
+		// Money.
+		$selling = 0;
+		$paid_sel = 0;
+		$items   = array();
+		foreach ( $send as $l ) {
+			if ( $l['unit_minor'] < 100 ) {
+				/* translators: %s: product name */
+				$errors[] = sprintf( __( '"%s" has a price below 1 BDT and cannot be sent.', 'resellingkori-connector' ), $l['name'] );
+			}
+			$selling  += $l['sell_minor'];
+			$paid_sel += $l['paid_minor'];
+			$item      = array(
+				'external_item_id'   => (int) $l['item_id'],
+				'rk_product_id'      => (int) $l['map']['rk_product_id'],
+				'rk_variation_id'    => (int) $l['map']['rk_variation_id'],
+				'sku'                => (string) $l['sku'],
+				'name'               => (string) $l['name'],
+				'quantity'           => (int) $l['qty'],
+				'selling_unit_price' => RKC_Money::format( $l['unit_minor'] ),
+			);
+			if ( $l['rk'] && isset( $l['rk']['base_minor'] ) && null !== $l['rk']['base_minor'] ) {
+				$item['expected_base_unit_price'] = RKC_Money::format( (int) $l['rk']['base_minor'] );
+				if ( $l['unit_minor'] < (int) $l['rk']['base_minor'] ) {
+					/* translators: %s: product name */
+					$warnings[] = sprintf( __( '"%s" is priced below the ResellingKori base price. ResellingKori may refuse it.', 'resellingkori-connector' ), $l['name'] );
+				}
+			}
+			if ( $l['rk'] && isset( $l['rk']['purchasable'] ) && false === $l['rk']['purchasable'] ) {
+				/* translators: %s: product name */
+				$errors[] = sprintf( __( '"%s" is out of stock at ResellingKori.', 'resellingkori-connector' ), $l['name'] );
+			}
+			$items[] = $item;
+		}
+
+		$is_cod       = self::is_cod( $order );
+		$shipping     = RKC_Money::from_wc( $order->get_shipping_total() ) + RKC_Money::from_wc( $order->get_shipping_tax() );
+		$order_total  = RKC_Money::from_wc( $order->get_total() ) - RKC_Money::from_wc( $order->get_total_refunded() );
+		$gap          = $order_total - $selling - $shipping; // Fees, discounts and rounding that are neither items nor shipping.
+
+		if ( $partial ) {
+			$default_delivery = 'order' === RKC_Settings::get( 'partial_delivery' ) ? $shipping : 0;
+		} else {
+			$default_delivery = $shipping;
+		}
+
+		// The delivery charge is the one amount the person may type. It is always the base figure; nothing below is folded into it
+		// on screen, so re-posting the box together with the checkbox can never count the same money twice.
+		$delivery_base = $default_delivery;
+		if ( isset( $opts['delivery'] ) && '' !== trim( (string) $opts['delivery'] ) ) {
+			$typed = RKC_Money::parse( (string) $opts['delivery'] );
+			if ( null === $typed ) {
+				$errors[] = __( 'The delivery charge is not a valid amount (use numbers with at most 2 decimals).', 'resellingkori-connector' );
+			} else {
+				$delivery_base = $typed;
+			}
+		}
+
+		// What else the store's total contains. Whole orders only (a partial order cannot be compared with the store's total).
+		$other_shown  = false; // A choice the person must see (1 BDT or more).
+		$include      = null;
+		$other_charge = 0;     // A fee the customer agreed to pay; ResellingKori's contract has no separate field, so it travels inside delivery_charge.
+		$credit       = 0;     // A discount or refund already given: counted as money the customer does not owe at the door.
+		$rounding     = 0;     // Under 1 BDT left over from unit-price rounding, collected so the customer pays exactly the order total.
+		if ( ! $partial ) {
+			if ( $gap >= 100 || $gap <= -100 ) {
+				$other_shown = true;
+				$include     = isset( $opts['include_other'] ) ? (bool) $opts['include_other'] : true;
+				if ( $include ) {
+					if ( $gap > 0 ) {
+						$other_charge = $gap;
+					} else {
+						$credit = -$gap;
+					}
+				}
+			} elseif ( $gap > 0 ) {
+				$rounding = $gap;
+			} elseif ( $gap < 0 ) {
+				$credit = -$gap;
+			}
+		}
+		$delivery = $delivery_base + $rounding + $other_charge; // The figure that is sent as delivery_charge.
+		$prepaid  = $credit;
+
+		$order_amount = $selling + $delivery;
+		if ( ! $is_cod ) {
+			$method  = 'prepaid';
+			$prepaid = $order_amount;
+			$cod     = 0;
+		} else {
+			$method = 'cod';
+			if ( $prepaid > $order_amount ) {
+				$prepaid = $order_amount;
+			}
+			$cod = $order_amount - $prepaid;
+			if ( $cod < 1 ) {
+				$method  = 'prepaid';
+				$prepaid = $order_amount;
+				$cod     = 0;
+			}
+		}
+
+		if ( isset( $limits['max_delivery_charge'] ) && $delivery > (int) round( (float) $limits['max_delivery_charge'] * 100 ) ) {
+			/* translators: %s: amount */
+			$errors[] = sprintf( __( 'The delivery charge is more than ResellingKori allows (%s).', 'resellingkori-connector' ), RKC_Money::display( (int) round( (float) $limits['max_delivery_charge'] * 100 ) ) );
+		}
+		if ( 'cod' === $method && isset( $limits['max_cod_amount'] ) && $cod > (int) round( (float) $limits['max_cod_amount'] * 100 ) ) {
+			/* translators: %s: amount */
+			$errors[] = sprintf( __( 'The cash to collect is more than ResellingKori allows (%s).', 'resellingkori-connector' ), RKC_Money::display( (int) round( (float) $limits['max_cod_amount'] * 100 ) ) );
+		}
+		if ( isset( $limits['max_order_amount'] ) && $order_amount > (int) round( (float) $limits['max_order_amount'] * 100 ) ) {
+			/* translators: %s: amount */
+			$errors[] = sprintf( __( 'The order total is more than ResellingKori allows (%s).', 'resellingkori-connector' ), RKC_Money::display( (int) round( (float) $limits['max_order_amount'] * 100 ) ) );
+		}
+		if ( isset( $limits['max_lines'] ) && count( $items ) > (int) $limits['max_lines'] ) {
+			$errors[] = __( 'This order has more lines than ResellingKori accepts in one order.', 'resellingkori-connector' );
 		}
 
 		$payload = array(
-			'external_order_id'     => (string) $order->get_id(),
+			'schema'                => 2,
 			'external_order_number' => (string) $order->get_order_number(),
-			'store_name'            => get_bloginfo( 'name' ),
-			'store_url'             => home_url(),
-			'callback_url'          => rest_url( 'rkc/v1/webhook' ),
-			'agent_email'           => (string) RKC_Settings::get( 'agent_email' ),
+			'currency'              => 'BDT',
+			'partial'               => (bool) $partial,
 			'customer'              => self::customer( $order ),
 			'items'                 => $items,
-			'payment_method'        => $is_cod ? 'cod' : 'prepaid',
-			'partial'               => (bool) $partial,
-			'items_total'           => round( $items_total, 2 ),
-			'cod_amount'            => round( $cod, 2 ),
-			'order_total'           => round( $total, 2 ),
-			'shipping_total'        => round( (float) $order->get_shipping_total(), 2 ),
-			'currency'              => $order->get_currency(),
-			'note'                  => (string) $order->get_customer_note(),
+			'payment'               => array(
+				'method'          => $method,
+				'delivery_charge' => RKC_Money::format( $delivery ),
+				'prepaid_amount'  => RKC_Money::format( $prepaid ),
+				'cod_amount'      => RKC_Money::format( $cod ),
+			),
+			'note'                  => substr( (string) $order->get_customer_note(), 0, 500 ),
 		);
+		$payload = (array) apply_filters( 'rkc_order_payload', $payload, $order, $lines );
 
-		return apply_filters( 'rkc_order_payload', $payload, $order, $lines );
+		return array(
+			'order_id'    => (int) $order->get_id(),
+			'mode'        => $mode,
+			'partial'     => $partial,
+			'lines'       => $lines,
+			'payload'     => $payload,
+			'errors'      => array_values( array_unique( $errors ) ),
+			'warnings'    => array_values( array_unique( $warnings ) ),
+			'fingerprint' => self::fingerprint( $payload ),
+			'money'       => array(
+				'selling'     => $selling,
+				'delivery'    => $delivery,
+				'delivery_base' => $delivery_base,
+				'default_delivery' => $default_delivery,
+				'other_charge' => $other_charge,
+				'credit'      => $credit,
+				'prepaid'     => $prepaid,
+				'cod'         => $cod,
+				'order'       => $order_amount,
+				'store_total' => $order_total,
+				'shipping'    => $shipping,
+				'gap'         => $gap,
+				'other_shown' => $other_shown,
+				'include'     => $include,
+				'rounding'    => $rounding,
+				'method'      => $method,
+			),
+		);
 	}
 
-	/* ---------------------------------------------------------------- AJAX */
-
-	private static function ajax_guard() {
-		check_ajax_referer( 'rkc_admin', 'nonce' );
-		if ( ! current_user_can( 'manage_woocommerce' ) ) {
-			wp_send_json_error( array( 'message' => __( 'Permission denied.', 'resellingkori-connector' ) ) );
-		}
+	/** Content fingerprint of a payload (the external id is not part of it). */
+	public static function fingerprint( array $payload ) {
+		unset( $payload['external_order_id'] );
+		return hash( 'sha256', wp_json_encode( self::ksort_deep( $payload ) ) );
 	}
 
-	public static function ajax_send() {
-		self::ajax_guard();
-		// phpcs:disable WordPress.Security.NonceVerification.Missing -- verified in ajax_guard().
-		$order   = wc_get_order( isset( $_POST['order_id'] ) ? absint( $_POST['order_id'] ) : 0 );
-		$compact = ! empty( $_POST['compact'] );
-		$opts    = array(
-			'item_ids' => isset( $_POST['item_ids'] ) ? array_map( 'absint', (array) wp_unslash( $_POST['item_ids'] ) ) : array(),
-			'extra'    => isset( $_POST['extra'] ) ? (float) wc_format_decimal( wp_unslash( $_POST['extra'] ) ) : 0.0,
-		);
-		// phpcs:enable
-		if ( ! $order instanceof WC_Order ) {
-			wp_send_json_error( array( 'message' => __( 'Order not found.', 'resellingkori-connector' ) ) );
+	private static function ksort_deep( $v ) {
+		if ( ! is_array( $v ) ) {
+			return $v;
 		}
+		$is_list = array_keys( $v ) === range( 0, count( $v ) - 1 );
+		foreach ( $v as $k => $x ) {
+			$v[ $k ] = self::ksort_deep( $x );
+		}
+		if ( ! $is_list ) {
+			ksort( $v );
+		}
+		return $v;
+	}
 
-		$res   = self::send( $order, $opts );
-		$order = wc_get_order( $order->get_id() );
-		$html  = self::render_box( $order, $compact );
-
-		if ( is_wp_error( $res ) ) {
-			wp_send_json_error(
-				array(
-					'message' => $res->get_error_message(),
-					'html'    => $html,
-				)
+	/**
+	 * Live ResellingKori data for the lines (base price, availability), keyed "productId:variationId".
+	 *
+	 * @return array|WP_Error
+	 */
+	public static function fetch_live( array $lines ) {
+		$out  = array();
+		$seen = array();
+		foreach ( $lines as $l ) {
+			if ( empty( $l['map'] ) || $l['qty'] < 1 ) {
+				continue;
+			}
+			$pid = (int) $l['map']['rk_product_id'];
+			if ( ! isset( $seen[ $pid ] ) ) {
+				$res = RKC_API_Client::get_product( $pid );
+				if ( is_wp_error( $res ) ) {
+					return $res;
+				}
+				$seen[ $pid ] = ( isset( $res['item'] ) && is_array( $res['item'] ) ) ? $res['item'] : array();
+			}
+			$item = $seen[ $pid ];
+			$vid  = (int) $l['map']['rk_variation_id'];
+			$node = $item;
+			if ( $vid && ! empty( $item['variations'] ) ) {
+				foreach ( $item['variations'] as $v ) {
+					if ( (int) $v['id'] === $vid ) {
+						$node = $v;
+						break;
+					}
+				}
+			}
+			$base = isset( $node['base_price'] ) ? RKC_Money::parse( (string) $node['base_price'] ) : null;
+			$out[ $pid . ':' . $vid ] = array(
+				'base_minor'  => $base,
+				'purchasable' => isset( $node['purchasable'] ) ? (bool) $node['purchasable'] : true,
+				'name'        => isset( $item['name'] ) ? (string) $item['name'] : '',
+				'stock'       => isset( $node['stock_quantity'] ) ? $node['stock_quantity'] : null,
 			);
 		}
+		return $out;
+	}
 
-		wp_send_json_success(
-			array(
-				'message' => sprintf(
-					/* translators: %s: ResellingKori order number */
-					__( 'Order successfully submitted to ResellingKori. RK order %s.', 'resellingkori-connector' ),
-					isset( $res['number'] ) ? $res['number'] : $res['id']
+	/* ------------------------------------------------------------- Review */
+
+	const REVIEW_TTL = 900; // A review is valid for 15 minutes.
+
+	private static function review_key( $order_id, $user_id ) {
+		return 'rkc_rv_' . (int) $order_id . '_' . (int) $user_id;
+	}
+
+	/** Identifies the mapping + quantities a review was made for; any change invalidates the cached ResellingKori data. */
+	private static function lines_signature( array $lines ) {
+		$sig = array();
+		foreach ( $lines as $l ) {
+			$sig[] = array( $l['item_id'], $l['qty'], empty( $l['map'] ) ? 0 : (int) $l['map']['rk_product_id'], empty( $l['map'] ) ? 0 : (int) $l['map']['rk_variation_id'] );
+		}
+		return md5( wp_json_encode( $sig ) );
+	}
+
+	/**
+	 * The proposal shown to the staff member, built with live ResellingKori data (base price, availability).
+	 *
+	 * @param WC_Order $order       Order.
+	 * @param array    $opts        Choices: item_ids, delivery, include_other.
+	 * @param int      $user_id     Reviewing user (reviews are per user).
+	 * @param bool     $refresh     Ask ResellingKori again even if a recent review exists.
+	 * @param bool     $cached_only When sending: never trust anything but the review the person actually saw.
+	 * @return array|WP_Error
+	 */
+	public static function review( WC_Order $order, array $opts, $user_id, $refresh = false, $cached_only = false ) {
+		$key    = self::review_key( $order->get_id(), $user_id );
+		$cached = get_transient( $key );
+		$lines  = self::lines( $order );
+		$sig    = self::lines_signature( $lines );
+		$rk     = null;
+
+		if ( is_array( $cached ) && ! $refresh && isset( $cached['rk'], $cached['at'], $cached['sig'] ) && $cached['sig'] === $sig && ( time() - (int) $cached['at'] ) < self::REVIEW_TTL ) {
+			$rk = (array) $cached['rk'];
+		}
+		if ( null === $rk ) {
+			if ( $cached_only ) {
+				return new WP_Error( 'rkc_review_expired', __( 'The review has expired or the order changed. Review the order again before sending.', 'resellingkori-connector' ) );
+			}
+			if ( 'none' === self::send_mode( $lines ) ) {
+				$rk = array();
+			} else {
+				$rk = self::fetch_live( $lines );
+				if ( is_wp_error( $rk ) ) {
+					return $rk;
+				}
+			}
+			set_transient(
+				$key,
+				array(
+					'rk'  => $rk,
+					'at'  => time(),
+					'sig' => $sig,
 				),
-				'html'    => $html,
-			)
-		);
-	}
-
-	public static function ajax_refresh() {
-		self::ajax_guard();
-		$order = wc_get_order( isset( $_POST['order_id'] ) ? absint( $_POST['order_id'] ) : 0 ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		if ( ! $order instanceof WC_Order ) {
-			wp_send_json_error( array( 'message' => __( 'Order not found.', 'resellingkori-connector' ) ) );
-		}
-
-		$res   = RKC_Sync::refresh_order( $order );
-		$order = wc_get_order( $order->get_id() );
-		$html  = self::render_box( $order, false );
-
-		if ( is_wp_error( $res ) ) {
-			wp_send_json_error(
-				array(
-					'message' => $res->get_error_message(),
-					'html'    => $html,
-				)
+				self::REVIEW_TTL
 			);
 		}
-		wp_send_json_success(
-			array(
-				'message' => __( 'Status refreshed.', 'resellingkori-connector' ),
-				'html'    => $html,
-			)
-		);
+		return self::draft( $order, $opts, $rk );
+	}
+
+	public static function forget_review( $order_id, $user_id ) {
+		delete_transient( self::review_key( $order_id, $user_id ) );
 	}
 }

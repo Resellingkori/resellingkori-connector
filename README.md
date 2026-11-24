@@ -4,7 +4,7 @@ Connect your WooCommerce shop to **resellingkori.com**. You keep selling at your
 
 | | |
 |---|---|
-| **Version** | 1.1.0 |
+| **Version** | 1.2.0 |
 | **Licence** | GPL-2.0-or-later (see `license.txt`) |
 | **Requires** | WordPress 6.0+ · WooCommerce 7.0+ (High-Performance Order Storage and legacy storage) · PHP 7.4+ with the **sodium** extension (8.1+ recommended) |
 | **Currency** | Orders are sent in **BDT (৳)** only |
@@ -23,6 +23,8 @@ Connect your WooCommerce shop to **resellingkori.com**. You keep selling at your
 | Follow the delivery | Status, courier and tracking number arrive by signed webhook, with a check every 15 minutes for orders that are still open as a backup. They show in the ResellingKori box on the order and, if you choose, change your order's status. |
 | Fix a mistake | **Cancel** the order at ResellingKori while it has not been processed, correct your order, and **send it again**. |
 | Let your sales agent work from the ResellingKori dashboard *(optional, new in 1.1.0)* | When you switch it on, your agent sees this shop's ResellingKori orders on a separate **ResellingKori** page in the agent dashboard, with ResellingKori's price next to yours. The agent can send, cancel, check and link from there. Your shop does the work itself and re-checks everything first. Nothing is collected until you say yes. |
+| Add ResellingKori products from the dashboard *(new in 1.2.0)* | Your agent picks products in the dashboard's **Add products** tab and sets your selling price; your shop creates them published and already linked, with descriptions, SKU, categories and pictures. Prices below ResellingKori's price, duplicates and SKUs you already use are refused. |
+| Stock monitor *(new in 1.2.0)* | Per product: when ResellingKori runs out, the product goes out of stock in your shop, and comes back when ResellingKori has it again. The dashboard lists recently out-of-stock linked products first. |
 
 ## Quick start
 

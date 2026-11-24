@@ -146,6 +146,9 @@ class RKC_Install {
 		if ( ! wp_next_scheduled( 'rkc_ws_tick' ) ) {
 			wp_schedule_event( time() + 90, 'rkc_minute', 'rkc_ws_tick' );
 		}
+		if ( ! wp_next_scheduled( 'rkc_stock_check' ) ) {
+			wp_schedule_event( time() + 120, 'rkc_15min', 'rkc_stock_check' );
+		}
 	}
 
 	public static function activate() {
@@ -162,6 +165,8 @@ class RKC_Install {
 		wp_clear_scheduled_hook( 'rkc_daily' );
 		wp_clear_scheduled_hook( 'rkc_ws_tick' );
 		wp_clear_scheduled_hook( 'rkc_ws_kick' );
+		wp_clear_scheduled_hook( 'rkc_stock_check' );
+		wp_clear_scheduled_hook( 'rkc_import_media' );
 	}
 
 	/** Runs on init: upgrades from older versions and repairs missing pieces. */

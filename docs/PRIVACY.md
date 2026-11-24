@@ -79,3 +79,8 @@ The diagnostic log **never** contains the secret (secrets, signatures, tokens, n
 Deactivating changes nothing. Deleting the plug-in always erases the credentials, scheduled jobs, the agent-dashboard state and temporary data; it keeps the submission records, product links, settings and logs **unless** *Settings → Delete all plugin data (links, submission records, logs) when the plugin is deleted* is ticked, in which case everything the Connector created is removed (tables, product meta, order meta, capabilities, options).
 
 **The agent dashboard's data at ResellingKori:** *switching the dashboard off* (Settings) or *Disconnect* tells ResellingKori to delete everything it holds from your shop. *Deactivating or deleting the plug-in does not contact ResellingKori* – so, if you used the dashboard, **switch it off first**. Otherwise the cards simply expire there after the retention period in A.2a.
+
+## Since 1.2.0
+
+* Product cards sent to the agent dashboard also carry the product's **stock state** in your shop (stock monitor on/off, made unavailable by the monitor, stock status, whether stock is managed by quantity, since when ResellingKori is out of stock). This is about products, not people: no customer data is added.
+* Adding a product from the dashboard sends nothing about your customers. Your shop downloads the product's pictures from the addresses ResellingKori's API gives.

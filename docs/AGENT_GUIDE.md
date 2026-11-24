@@ -90,6 +90,20 @@ Only linked products show their orders here, so link your products first.
 
 Linking, unlinking and confirming are carried out by your shop (like sending), so the result appears after a few seconds.
 
+### Stock (needs Connector 1.2.0 in your shop)
+
+* Every linked product shows ResellingKori's live stock: **ResellingKori stock: 12**, or **Out of stock at ResellingKori since …**.
+* **Recently out of stock at ResellingKori** – the red box at the top lists the newest stock-outs first. **See all** opens the filter **Out of stock at ResellingKori**. Under *Linked* and *All*, stock-outs come first.
+* **Stock monitor** (tick box on each linked product): when ResellingKori runs out, the product goes **out of stock in your shop** too, and comes back when ResellingKori has it again. Untick it and your shop is not changed. **Stock monitor for all linked products** switches it on for everything at once.
+* "Still for sale in your shop" next to a stock-out means the monitor is off for that product: turn it on, or take the product off sale yourself.
+
+## 3a. The Add products tab (needs Connector 1.2.0 in your shop)
+
+1. Search by name or SKU, choose a category, keep **In stock only** ticked to hide what cannot be ordered. Each product shows what you pay (**You pay**), the stock, and **Already in your shop** if you have it.
+2. Tick **Select** on the products you want. Enter **Your selling price** (for a product with variations: per variation, or type one amount in **Same price for all** and press **Apply**; untick a variation you do not want). ResellingKori's own shop price is filled in to start with – change it as you like. The page shows your profit per piece and refuses a price below what you pay.
+3. Keep **Turn on stock monitor** ticked (recommended) and press **Add to my shop**, then **Add products**.
+4. Your shop creates each product **published**, already **linked**, with its descriptions, SKU, categories and pictures (pictures arrive within a few minutes). A product that is already in your shop, or whose SKU your shop already uses, is not added twice – link the existing product instead.
+
 ## 4. The Overview tab
 
 Shows the connection (shop, status, last contact, the Connector's version), how many requests are waiting for your shop, whether instant delivery works, and the number of orders and products. It also repeats how the page works.
@@ -114,4 +128,7 @@ This page shows your shop's orders that contain ResellingKori products: number, 
 6. ফলাফল “not known” হলে **আবার পাঠাবেন না** — **Check status** চাপুন।
 7. শিপ হওয়ার আগে **Cancel at ResellingKori** দিয়ে বাতিল করা যায়। **Skip** শুধু আপনার তালিকা থেকে অর্ডার লুকায়, কাউকে কিছু জানায় না।
 8. **Products** ট্যাবে: **Match all by SKU** চাপলে একই SKU-র পণ্য নিজে লিঙ্ক হয়; বাকিগুলো **Choose ResellingKori product** দিয়ে নিজে বেছে নিন; অনুমানে লিঙ্ক হওয়া পণ্য **Confirm match** না করলে অর্ডারে ব্যবহার হয় না।
-9. কিছু পুরোনো মনে হলে **Sync now** চাপুন। ইমেইল, পুরো ঠিকানা ও পুরো ফোন নম্বর এই পেজে আসে না।
+9. **Products** ট্যাবের উপরে লাল বক্সে **Recently out of stock at ResellingKori** — সম্প্রতি ResellingKori-তে স্টক শেষ হওয়া লিঙ্ক করা পণ্য, নতুনগুলো আগে। প্রতিটি লিঙ্ক করা পণ্যে ResellingKori-র স্টক (**ResellingKori stock: 12**) দেখা যায়।
+10. **Stock monitor** টিক দিলে: ResellingKori-তে স্টক শেষ হলে আপনার শপেও পণ্যটি *Out of stock* হবে, আবার স্টক এলে ফিরে আসবে। টিক না দিলে শপে কিছু বদলাবে না। **Stock monitor for all linked products** দিয়ে সবগুলোতে একসাথে চালু করা যায়।
+11. **Add products** ট্যাব: নাম/SKU দিয়ে খুঁজুন, ক্যাটাগরি বাছুন → পণ্যে **Select** টিক দিন → **Your selling price** লিখুন (ভ্যারিয়েশন থাকলে প্রতিটির দাম, অথবা **Same price for all**) → **Turn on stock monitor** টিক রাখুন → **Add to my shop**। পণ্যটি আপনার শপে সরাসরি **Published** হয়ে, লিঙ্ক করা অবস্থায় তৈরি হবে; ছবি কয়েক মিনিটে আসবে। যা কিনছেন তার চেয়ে কম দাম দেওয়া যায় না। (দুটোর জন্যই শপে Connector 1.2.0 লাগবে।)
+12. কিছু পুরোনো মনে হলে **Sync now** চাপুন। ইমেইল, পুরো ঠিকানা ও পুরো ফোন নম্বর এই পেজে আসে না।

@@ -3,7 +3,7 @@
  * Plugin Name:       ResellingKori Fulfillment Connector
  * Plugin URI:        https://resellingkori.com/
  * Description:       Connect your WooCommerce store to ResellingKori: match your products (SKU first, name suggestions second), send paid orders for fulfilment with your own selling prices, receive status and tracking back automatically, and (optionally) manage the same from your ResellingKori agent dashboard.
- * Version:           1.1.0
+ * Version:           1.2.0
  * Author:            ResellingKori
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
@@ -20,7 +20,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'RKC_VERSION', '1.1.0' );
+define( 'RKC_VERSION', '1.2.0' );
 define( 'RKC_DB_VERSION', '2' );
 define( 'RKC_FILE', __FILE__ );
 define( 'RKC_DIR', plugin_dir_path( __FILE__ ) );

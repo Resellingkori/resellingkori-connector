@@ -27,7 +27,7 @@ final class RKC_Plugin {
 		}
 		$done = true;
 		$dir  = RKC_DIR . 'includes/';
-		foreach ( array( 'crypto', 'signer', 'redact', 'money', 'db', 'config', 'settings', 'logger', 'install', 'api-client', 'matcher', 'mapping', 'orders', 'submit', 'webhook', 'connect', 'workspace', 'workspace-exec', 'privacy' ) as $file ) {
+		foreach ( array( 'crypto', 'signer', 'redact', 'money', 'db', 'config', 'settings', 'logger', 'install', 'api-client', 'matcher', 'mapping', 'orders', 'submit', 'webhook', 'connect', 'workspace', 'workspace-exec', 'privacy', 'stock', 'import' ) as $file ) {
 			require_once $dir . 'class-rkc-' . $file . '.php';
 		}
 	}
@@ -70,9 +70,11 @@ final class RKC_Plugin {
 		add_action( 'rkc_daily', array( 'RKC_Install', 'housekeeping' ) );
 		add_action( 'rkc_ws_tick', array( 'RKC_Workspace', 'cron_tick' ) );
 		add_action( 'rkc_ws_kick', array( 'RKC_Workspace', 'cron_tick' ) );
+		add_action( 'rkc_import_media', array( 'RKC_Import', 'cron_media' ) );
 
 		RKC_Webhook::init();
 		RKC_Workspace::init();
+		RKC_Stock::init();
 		RKC_Privacy::init();
 
 		if ( is_admin() ) {

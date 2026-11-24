@@ -44,6 +44,12 @@ class RKC_Workspace {
 	/** @var bool */
 	private static $shutdown_set = false;
 
+	/** @var int[] Units whose stock ResellingKori asked this shop to check now (sync answer, since 1.2.0). */
+	private static $stock_hint = array();
+
+	/** What this Connector can do beyond protocol 1 (the dashboard offers a feature only when the shop lists it). */
+	const FEATURES = array( 'import', 'stock' );
+
 	/* ============================================================== Wiring */
 
 	public static function init() {
@@ -229,7 +235,7 @@ class RKC_Workspace {
 
 	/** A link between a store product and a ResellingKori product changed (created, edited, confirmed or removed). */
 	public static function on_meta( $meta_id, $object_id, $meta_key ) {
-		if ( ! in_array( $meta_key, array( RKC_Mapping::META_PRODUCT, RKC_Mapping::META_VARIATION, RKC_Mapping::META_REVIEW ), true ) || ! self::enabled() ) {
+		if ( ! in_array( $meta_key, array( RKC_Mapping::META_PRODUCT, RKC_Mapping::META_VARIATION, RKC_Mapping::META_REVIEW, RKC_Stock::META_MONITOR, RKC_Stock::META_AUTO ), true ) || ! self::enabled() ) {
 			return;
 		}
 		self::$pending_units[ (int) $object_id ] = true;
@@ -572,6 +578,7 @@ class RKC_Workspace {
 			'price'  => preg_match( '/^\d{1,12}(\.\d{1,4})?$/', $price ) ? $price : '',
 			'img'    => (string) $d['image'],
 			'map'    => $map,
+			'stock'  => RKC_Stock::card( $p ),
 		);
 		$card['rev']   = self::rev_of( $card, array() );
 		$card['built'] = (int) round( microtime( true ) * 1000 );
@@ -721,6 +728,11 @@ class RKC_Workspace {
 				$out['results']  += count( $built['body']['results'] );
 				$ran              = RKC_Workspace_Exec::run_queued( $deadline );
 				$out['commands'] += $ran;
+				if ( self::$stock_hint && time() < $deadline ) {
+					$hint             = array_keys( self::$stock_hint );
+					self::$stock_hint = array();
+					RKC_Stock::check_now( $hint, $deadline );
+				}
 				// What an instruction changed (a link made, confirmed or removed) is reported in the very next round of this
 				// run - not only after this request has ended - so the dashboard shows the new state together with "done".
 				self::flush_units();
@@ -934,6 +946,7 @@ class RKC_Workspace {
 			'wp'          => (string) get_bloginfo( 'version' ),
 			'php'         => PHP_VERSION,
 			'actions'     => (bool) self::actions_allowed(),
+			'features'    => self::FEATURES,
 		);
 	}
 
@@ -1009,6 +1022,14 @@ class RKC_Workspace {
 		}
 		if ( ! empty( $res['commands'] ) && is_array( $res['commands'] ) ) {
 			RKC_Workspace_Exec::intake( $res['commands'] );
+		}
+		// Since 1.2.0: "the stock of these units changed at ResellingKori". Only WHEN to ask; the answer comes from the API.
+		if ( ! empty( $sync['stock_check'] ) && is_array( $sync['stock_check'] ) ) {
+			foreach ( array_slice( $sync['stock_check'], 0, 100 ) as $woo ) {
+				if ( is_numeric( $woo ) && (int) $woo > 0 ) {
+					self::$stock_hint[ (int) $woo ] = true;
+				}
+			}
 		}
 		return $patch;
 	}

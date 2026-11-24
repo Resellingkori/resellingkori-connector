@@ -31,9 +31,11 @@ class RKC_Mapping {
 	const META_CHECKED = '_rkc_rk_checked';
 	const META_REVIEW  = '_rkc_map_review';
 	const META_BY      = '_rkc_mapped_by';
+	// New in v1.2.0.
+	const META_STOCK = '_rkc_rk_stock'; // ResellingKori's stock quantity at the last check ('' = not counted).
 
 	private static function all_keys() {
-		return array( self::META_PRODUCT, self::META_VARIATION, self::META_SKU, self::META_NAME, self::META_URL, self::META_SOURCE, self::META_TIME, self::META_IMAGE, self::META_BASE, self::META_AVAIL, self::META_CHECKED, self::META_REVIEW, self::META_BY );
+		return array( self::META_PRODUCT, self::META_VARIATION, self::META_SKU, self::META_NAME, self::META_URL, self::META_SOURCE, self::META_TIME, self::META_IMAGE, self::META_BASE, self::META_AVAIL, self::META_CHECKED, self::META_REVIEW, self::META_BY, self::META_STOCK );
 	}
 
 	/**
@@ -125,18 +127,31 @@ class RKC_Mapping {
 
 	/** @param array|null $node Item or variation node; null = the mapped variation no longer exists. */
 	private static function store_availability( $woo_id, $node ) {
+		$old = (string) get_post_meta( $woo_id, self::META_AVAIL, true );
 		if ( null === $node ) {
-			update_post_meta( $woo_id, self::META_AVAIL, 'gone' );
+			$new = 'gone';
 		} else {
-			update_post_meta( $woo_id, self::META_AVAIL, ! isset( $node['purchasable'] ) || $node['purchasable'] ? 'in' : 'out' );
+			$new = ! isset( $node['purchasable'] ) || $node['purchasable'] ? 'in' : 'out';
 			update_post_meta( $woo_id, self::META_BASE, isset( $node['base_price'] ) ? sanitize_text_field( (string) $node['base_price'] ) : '' );
+			update_post_meta( $woo_id, self::META_STOCK, isset( $node['stock_quantity'] ) && is_numeric( $node['stock_quantity'] ) ? (int) $node['stock_quantity'] : '' );
 		}
+		update_post_meta( $woo_id, self::META_AVAIL, $new );
 		update_post_meta( $woo_id, self::META_CHECKED, time() );
+		// Since 1.2.0: remember when ResellingKori ran out, and let the stock monitor follow.
+		if ( class_exists( 'RKC_Stock' ) ) {
+			RKC_Stock::availability_changed( $woo_id, $old, $new );
+			RKC_Stock::apply( $woo_id );
+		}
 	}
 
 	public static function clear( $woo_id ) {
 		foreach ( self::all_keys() as $key ) {
 			delete_post_meta( $woo_id, $key );
+		}
+		// An unlinked product is no longer monitored; if the monitor had made it unavailable, it is given back.
+		if ( class_exists( 'RKC_Stock' ) ) {
+			RKC_Stock::set_monitor( $woo_id, false );
+			delete_post_meta( $woo_id, RKC_Stock::META_OUT_SINCE );
 		}
 		do_action( 'rkc_product_unmapped', $woo_id );
 	}

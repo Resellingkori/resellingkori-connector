@@ -20,13 +20,13 @@ defined( 'ABSPATH' ) || exit;
 
 class RKC_Workspace_Exec {
 
-	const TYPES = array( 'send_order', 'cancel_order', 'check_status', 'refresh_order', 'link_product', 'unlink_product', 'confirm_mapping', 'bulk_sku', 'resync' );
+	const TYPES = array( 'send_order', 'cancel_order', 'check_status', 'refresh_order', 'link_product', 'unlink_product', 'confirm_mapping', 'bulk_sku', 'resync', 'import_product', 'stock_monitor' );
 
 	/** Instructions that only make the dashboard look again; they are allowed when "act" is switched off. */
 	const VIEW_ONLY_OK = array( 'refresh_order', 'resync' );
 
 	/** The only keys a report may carry back. */
-	const DATA_KEYS = array( 'rk_order_id', 'linked', 'review', 'not_found', 'siblings', 'checked', 'rk_number', 'stage', 'rk_status', 'errors' );
+	const DATA_KEYS = array( 'rk_order_id', 'linked', 'review', 'not_found', 'siblings', 'checked', 'rk_number', 'stage', 'rk_status', 'errors', 'woo_id', 'variations', 'monitored', 'images', 'unavailable' );
 
 	/* ================================================================ Intake */
 
@@ -157,6 +157,9 @@ class RKC_Workspace_Exec {
 		if ( ! empty( $d['errors'] ) && is_array( $d['errors'] ) ) {
 			$data['errors'] = array_slice( array_map( 'strval', $d['errors'] ), 0, 5 );
 		}
+		if ( ! empty( $d['woo_id'] ) && is_numeric( $d['woo_id'] ) ) {
+			$data['woo_id'] = (int) $d['woo_id'];
+		}
 		return self::fail( '' !== $code ? $code : $fallback, (string) $e->get_error_message(), $data );
 	}
 
@@ -201,7 +204,7 @@ class RKC_Workspace_Exec {
 			return self::fail( 'not_connected', __( 'This shop is not connected to ResellingKori right now. Nothing was changed.', 'resellingkori-connector' ) );
 		}
 		if ( ! RKC_Workspace::actions_allowed() && ! in_array( $type, self::VIEW_ONLY_OK, true ) ) {
-			return self::fail( 'actions_off', __( 'The shop owner has switched off sending, cancelling and linking from the agent dashboard. Nothing was changed.', 'resellingkori-connector' ) );
+			return self::fail( 'actions_off', __( 'The shop owner has switched off sending, cancelling, linking and adding products from the agent dashboard. Nothing was changed.', 'resellingkori-connector' ) );
 		}
 
 		switch ( $type ) {
@@ -221,6 +224,10 @@ class RKC_Workspace_Exec {
 				return self::confirm_mapping( $row, $args );
 			case 'bulk_sku':
 				return self::bulk_sku( $args );
+			case 'import_product':
+				return self::import_product( $row, $args );
+			case 'stock_monitor':
+				return self::stock_monitor( $args );
 			case 'resync':
 				RKC_Workspace::start_full();
 				return self::ok( 'resync_started', __( 'This shop will send everything again.', 'resellingkori-connector' ) );
@@ -496,5 +503,66 @@ class RKC_Workspace_Exec {
 				'not_found' => (int) $res['not_found'],
 			)
 		);
+	}
+
+	/* ============================================================ Since 1.2.0 */
+
+	/** Create a ResellingKori product in this shop, linked (RKC_Import does every check). */
+	private static function import_product( $row, array $args ) {
+		$pid = isset( $args['rk_product_id'] ) && is_numeric( $args['rk_product_id'] ) ? (int) $args['rk_product_id'] : 0;
+		if ( $pid < 1 || 'rk' . $pid !== (string) $row->target ) {
+			return self::fail( 'bad_command', __( 'This shop could not read the instruction.', 'resellingkori-connector' ) );
+		}
+		$res = RKC_Import::run( $args );
+		if ( is_wp_error( $res ) ) {
+			return self::from_error( $res, 'import_failed' );
+		}
+		self::touch_product( (int) $res['woo_id'] );
+		return self::ok(
+			'imported',
+			'',
+			array(
+				'woo_id'     => (int) $res['woo_id'],
+				'variations' => (int) $res['variations'],
+				'monitored'  => (int) $res['monitored'],
+				'images'     => (int) $res['images'],
+				'linked'     => max( 1, (int) $res['variations'] ),
+			)
+		);
+	}
+
+	/** Switch the stock monitor on or off for linked units, then check ResellingKori's stock of those switched on. */
+	private static function stock_monitor( array $args ) {
+		$ids = ( isset( $args['woo_ids'] ) && is_array( $args['woo_ids'] ) ) ? array_slice( array_values( array_unique( array_map( 'intval', $args['woo_ids'] ) ) ), 0, 500 ) : array();
+		$on  = ! empty( $args['on'] );
+		$n   = 0;
+		$chk = array();
+		foreach ( $ids as $id ) {
+			if ( $id < 1 || ! RKC_Mapping::get( $id ) ) {
+				continue;
+			}
+			RKC_Stock::set_monitor( $id, $on );
+			RKC_Workspace::mark( 'p', $id );
+			++$n;
+			if ( $on ) {
+				$chk[] = $id;
+			}
+		}
+		if ( ! $n ) {
+			return self::fail( 'not_linked', __( 'None of these products is linked to ResellingKori, so nothing was changed.', 'resellingkori-connector' ) );
+		}
+		$res = $chk ? RKC_Stock::check( array_slice( $chk, 0, 100 ), time() + 10 ) : array( 'checked' => 0, 'unavailable' => 0 );
+		return self::ok( $on ? 'monitor_on' : 'monitor_off', '', array( 'monitored' => $on ? $n : 0, 'checked' => (int) $res['checked'], 'unavailable' => (int) $res['unavailable'] ) );
+	}
+
+	/** A new product (and its variations) must reach the dashboard in the next round of this run. */
+	private static function touch_product( $woo_id ) {
+		RKC_Workspace::mark( 'p', $woo_id );
+		$p = wc_get_product( $woo_id );
+		if ( $p && $p->is_type( 'variable' ) ) {
+			foreach ( array_slice( $p->get_children(), 0, 200 ) as $c ) {
+				RKC_Workspace::mark( 'p', (int) $c );
+			}
+		}
 	}
 }

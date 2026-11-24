@@ -4,6 +4,37 @@ This plug-in follows [Semantic Versioning](https://semver.org/). **Connector 1.x
 
 ---
 
+## 1.2.0 – 2026-11-24
+
+Adds **Add products from the agent dashboard** and the **stock monitor**. Everything in 1.1.0 works as before. Needs ResellingKori Agent Workspace **1.1.0** at ResellingKori for the dashboard parts; the stock monitor's 15-minute check works with any Fulfillment API 1.x.
+
+**New: add (import) ResellingKori products from the dashboard**
+* The agent picks products in the dashboard's new **Add products** tab, enters a selling price (per variation for variable products) and presses *Add to my shop*. The shop creates the product **published**, already **linked** to ResellingKori, with name, descriptions, SKU, weight, categories (matched by slug or name, missing ones created) and pictures.
+* The shop reads the product itself from ResellingKori's API (`GET /products/{id}?include=description`) and checks every price against ResellingKori's **live base price**; a lower price is refused and nothing is created.
+* Never twice: a product already linked to the same ResellingKori product, or a SKU that already exists in the shop, stops the import with a message ("link that product instead").
+* The product is built as a hidden draft and published only at the end; a crash leaves a marked draft that the next import of the same product removes.
+* Pictures (main picture, up to 7 gallery pictures, variation pictures) are downloaded in the background (`rkc_import_media`, about 20 seconds per run): only real JPEG/PNG/WebP/GIF images, at most 8 MB each, never from a local address (`wp_safe_remote_get`).
+
+**New: stock monitor (per product and per variation)**
+* When it is on and a linked product is out of stock (or gone) at ResellingKori, it becomes **out of stock in the shop**; when ResellingKori has it again, the shop's previous stock status comes back. Off = nothing changes.
+* Stock not managed by quantity: the stock status is set and restored. Stock managed by quantity: the quantity is never touched; the product is shown and sold as out of stock while the marker is set.
+* Checked every 15 minutes (`rkc_stock_check`, up to 300 monitored products per run, the least recently checked first), and **within about a minute** when the dashboard reports a stock change (the sync answer's `stock_check` hint only says *when* to ask; the shop reads the stock from the API itself).
+* Switched on from the dashboard (per product, or for all linked products), when importing (ticked by default), or on the product's edit screen in the shop (*Inventory → ResellingKori stock monitor*, also per variation).
+* Unlinking a product switches its monitor off and gives the product back if the monitor had made it unavailable.
+
+**Changed**
+* Product cards sent to the dashboard carry a `stock` object: monitor on/off, marked by the monitor, the shop's stock status, managed by quantity, out-of-stock-since time. No personal data.
+* The shop reports `state.features = ["import", "stock"]` so the dashboard only offers what this Connector can do.
+* *Settings → Let the dashboard act* now also covers adding products and the stock monitor.
+* New post meta: `_rkc_stock_monitor`, `_rkc_stock_auto_out`, `_rkc_stock_prev`, `_rkc_rk_out_since`, `_rkc_rk_stock`, `_rkc_import_pending`, `_rkc_imported_from`, `_rkc_imported_at`; new option `rkc_import_media`; new scheduled tasks `rkc_stock_check` (15 min) and `rkc_import_media` (one-off). No database table changes (database version stays 2).
+
+### Known limits
+* Products the monitor made unavailable stay unavailable if the plug-in is **deactivated or deleted** while ResellingKori is out of stock (nothing runs any more to bring them back): switch the monitor off first, or set the stock status by hand.
+* With stock managed by quantity, "hide out-of-stock products" in catalogue lists does not hide a monitored product (WooCommerce's lookup table follows the quantity); it still cannot be bought.
+* The translation template (`.pot`) was not regenerated in this release.
+
+---
+
 ## 1.1.0 – 2026-11-04
 
 Adds the optional **ResellingKori agent dashboard**. Everything in 1.0.0 works as before; nothing new is collected or sent until an administrator says yes.

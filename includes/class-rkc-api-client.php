@@ -203,6 +203,11 @@ class RKC_API_Client {
 		return self::request( 'GET', '/rk/v1/products/' . absint( $id ) );
 	}
 
+	/** The product with its full description (used to import it into the shop). */
+	public static function get_product_full( $id ) {
+		return self::request( 'GET', '/rk/v1/products/' . absint( $id ), array( 'include' => 'description' ) );
+	}
+
 	public static function create_order( array $payload ) {
 		return self::request( 'POST', '/rk/v1/orders', array(), $payload, 40 );
 	}

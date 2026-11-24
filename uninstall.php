@@ -29,7 +29,10 @@ wp_clear_scheduled_hook( 'rkc_poll_orders' );
 wp_clear_scheduled_hook( 'rkc_daily' );
 wp_clear_scheduled_hook( 'rkc_ws_tick' );
 wp_clear_scheduled_hook( 'rkc_ws_kick' );
+wp_clear_scheduled_hook( 'rkc_stock_check' );
+wp_clear_scheduled_hook( 'rkc_import_media' );
 delete_option( 'rkc_ws_state' );
+delete_option( 'rkc_import_media' );
 
 // Review caches, throttles and flash messages. The names are matched in PHP, not with an escaped LIKE pattern, so that this
 // behaves identically on MySQL, MariaDB and SQLite.

@@ -38,7 +38,7 @@ class RKC_Privacy {
 		$content  = '<h2>' . esc_html__( 'ResellingKori orders', 'resellingkori-connector' ) . '</h2>';
 		$content .= '<p class="privacy-policy-tutorial">' . esc_html__( 'Suggested text for your privacy policy:', 'resellingkori-connector' ) . '</p>';
 		$content .= '<p>' . esc_html__( 'When we fulfil an order through our supplier ResellingKori, we send them the recipient name, phone number, delivery address, optional e-mail address, the items ordered and the amounts, so that they can pack and deliver the order. We keep a copy of what we sent for our records and to prevent duplicate orders.', 'resellingkori-connector' ) . '</p>';
-		$content .= '<p>' . esc_html__( 'If the ResellingKori agent dashboard is switched on, orders that contain a ResellingKori product are also shown to the sales agent who runs our ResellingKori account: order number, status, items and amounts, the recipient\'s name and city and a partly hidden phone number. The e-mail address, the street address and the full phone number are not shown there.', 'resellingkori-connector' ) . '</p>';
+		$content .= '<p>' . esc_html__( 'If the ResellingKori agent dashboard is switched on, orders that contain a ResellingKori product are also shown to the sales agent who runs our ResellingKori account: order number, status, items and amounts, the recipient\'s name, phone number and delivery address. The e-mail address is not shown there.', 'resellingkori-connector' ) . '</p>';
 		wp_add_privacy_policy_content( 'ResellingKori Fulfillment Connector', wp_kses_post( $content ) );
 	}
 

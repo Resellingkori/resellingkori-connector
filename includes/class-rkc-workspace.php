@@ -4,7 +4,7 @@
  *
  * The shop is always the one that calls out. About once a minute (and at once when the dashboard "wakes" it) it makes ONE
  * signed request to ResellingKori that
- *   - reports the orders and products that changed (small "cards": no e-mail, no street address, no full phone number),
+ *   - reports the orders and products that changed (small "cards": name, phone and address, but no e-mail),
  *   - reports what became of the instructions it was given earlier, and
  *   - receives the instructions that are waiting (send an order, cancel it, link a product ...).
  * ResellingKori never opens a connection to this shop except for the "wake" link, which only asks it to run that same
@@ -501,6 +501,8 @@ class RKC_Workspace {
 			'customer'     => array(
 				'name'       => self::text( $cust['name'], 120 ),
 				'phone_hint' => self::mask_phone( $cust['phone'] ),
+				'phone'      => self::text( $cust['phone'], 24 ),
+				'address'    => self::text( implode( ', ', array_filter( array( $cust['address_1'], $cust['address_2'] ) ) ), 300 ),
 				'city'       => self::text( $cust['city'], 60 ),
 				'state'      => self::text( $cust['state'], 60 ),
 			),
